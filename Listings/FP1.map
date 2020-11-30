@@ -1,0 +1,94 @@
+Component: ARM Compiler 5.06 update 3 (build 300) Tool: armlink [4d35c9]
+
+==============================================================================
+
+Section Cross References
+
+    fp1.o(RESET) refers to fp1.o(MYCODE) for Reset_Handler
+
+
+==============================================================================
+
+Image Symbol Table
+
+    Local Symbols
+
+    Symbol Name                              Value     Ov Type        Size  Object(Section)
+
+    FP1.s                                    0x00000000   Number         0  fp1.o ABSOLUTE
+    RESET                                    0x08000000   Section        8  fp1.o(RESET)
+    MYCODE                                   0x08000008   Section      196  fp1.o(MYCODE)
+    GPIO_ClockInit                           0x08000015   Thumb Code    16  fp1.o(MYCODE)
+    GPIO_init                                0x08000025   Thumb Code    16  fp1.o(MYCODE)
+    IDLE                                     0x08000035   Thumb Code    84  fp1.o(MYCODE)
+    oneSecondDelay                           0x08000089   Thumb Code    12  fp1.o(MYCODE)
+    TurnOnLight                              0x08000097   Thumb Code    22  fp1.o(MYCODE)
+
+    Global Symbols
+
+    Symbol Name                              Value     Ov Type        Size  Object(Section)
+
+    BuildAttributes$$THM_ISAv4$P$D$K$B$S$PE$A:L22UL41UL21$X:L11$S22US41US21$IEEE1$IW$USESV6$~STKCKD$USESV7$~SHL$OSPACE$EBA8$STANDARDLIB$PRES8$EABIv2 0x00000000   Number         0  anon$$obj.o ABSOLUTE
+    __Vectors                                0x08000000   Data           4  fp1.o(RESET)
+    Reset_Handler                            0x08000009   Thumb Code    12  fp1.o(MYCODE)
+
+
+
+==============================================================================
+
+Memory Map of the image
+
+  Image Entry point : 0x08000009
+
+  Load Region LR_IROM1 (Base: 0x08000000, Size: 0x000000cc, Max: 0x00020000, ABSOLUTE)
+
+    Execution Region ER_IROM1 (Base: 0x08000000, Size: 0x000000cc, Max: 0x00020000, ABSOLUTE)
+
+    Base Addr    Size         Type   Attr      Idx    E Section Name        Object
+
+    0x08000000   0x00000008   Data   RO            1    RESET               fp1.o
+    0x08000008   0x000000c4   Code   RO            2  * MYCODE              fp1.o
+
+
+    Execution Region RW_IRAM1 (Base: 0x20000000, Size: 0x00000000, Max: 0x00002000, ABSOLUTE)
+
+    **** No section assigned to this execution region ****
+
+
+==============================================================================
+
+Image component sizes
+
+
+      Code (inc. data)   RO Data    RW Data    ZI Data      Debug   Object Name
+
+       196         36          8          0          0        592   fp1.o
+
+    ----------------------------------------------------------------------
+       196         36          8          0          0        592   Object Totals
+         0          0          0          0          0          0   (incl. Generated)
+         0          0          0          0          0          0   (incl. Padding)
+
+    ----------------------------------------------------------------------
+         0          0          0          0          0          0   Library Totals
+         0          0          0          0          0          0   (incl. Padding)
+
+    ----------------------------------------------------------------------
+
+==============================================================================
+
+
+      Code (inc. data)   RO Data    RW Data    ZI Data      Debug   
+
+       196         36          8          0          0        592   Grand Totals
+       196         36          8          0          0        592   ELF Image Totals
+       196         36          8          0          0          0   ROM Totals
+
+==============================================================================
+
+    Total RO  Size (Code + RO Data)                  204 (   0.20kB)
+    Total RW  Size (RW Data + ZI Data)                 0 (   0.00kB)
+    Total ROM Size (Code + RO Data + RW Data)        204 (   0.20kB)
+
+==============================================================================
+

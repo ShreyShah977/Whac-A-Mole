@@ -1,0 +1,887 @@
+
+
+
+ARM Macro Assembler    Page 1 
+
+
+    1 00000000         ; GPIO Test program - Dave Duguid, 2011
+    2 00000000         ; Modified Trevor Douglas 2014
+    3 00000000         
+    4 00000000         
+    5 00000000         ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    6 00000000         ;;  Author: Shrey Shah
+    7 00000000         ;;  SID: 200377176
+    8 00000000         ;;  Date: November 27th 2020
+    9 00000000         ;;  Class: ENSE 352 Fall 2020
+   10 00000000         ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+   11 00000000         
+   12 00000000         
+   13 00000000         ;;; Directives
+   14 00000000                 PRESERVE8
+   15 00000000                 THUMB
+   16 00000000         
+   17 00000000         
+   18 00000000         ;;; Equates
+   19 00000000         
+   20 00000000 20001000 
+                       INITIAL_MSP
+                               EQU              0x20001000  ; Initial Main Stac
+                                                            k Pointer Value
+   21 00000000         
+   22 00000000         
+   23 00000000         ;PORT A GPIO - Base Addr: 0x40010800
+   24 00000000 40010800 
+                       GPIOA_CRL
+                               EQU              0x40010800  ; (0x00) Port Confi
+                                                            guration Register f
+                                                            or Px7 -> Px0
+   25 00000000 40010804 
+                       GPIOA_CRH
+                               EQU              0x40010804  ; (0x04) Port Confi
+                                                            guration Register f
+                                                            or Px15 -> Px8
+   26 00000000 40010808 
+                       GPIOA_IDR
+                               EQU              0x40010808  ; (0x08) Port Input
+                                                             Data Register
+   27 00000000 4001080C 
+                       GPIOA_ODR
+                               EQU              0x4001080C  ; (0x0C) Port Outpu
+                                                            t Data Register
+   28 00000000 40010810 
+                       GPIOA_BSRR
+                               EQU              0x40010810  ; (0x10) Port Bit S
+                                                            et/Reset Register
+   29 00000000 40010814 
+                       GPIOA_BRR
+                               EQU              0x40010814  ; (0x14) Port Bit R
+                                                            eset Register
+   30 00000000 40010818 
+                       GPIOA_LCKR
+                               EQU              0x40010818  ; (0x18) Port Confi
+                                                            guration Lock Regis
+                                                            ter
+   31 00000000         
+   32 00000000         ;PORT B GPIO - Base Addr: 0x40010C00
+
+
+
+ARM Macro Assembler    Page 2 
+
+
+   33 00000000 40010C00 
+                       GPIOB_CRL
+                               EQU              0x40010C00  ; (0x00) Port Confi
+                                                            guration Register f
+                                                            or Px7 -> Px0
+   34 00000000 40010C04 
+                       GPIOB_CRH
+                               EQU              0x40010C04  ; (0x04) Port Confi
+                                                            guration Register f
+                                                            or Px15 -> Px8
+   35 00000000 40010C08 
+                       GPIOB_IDR
+                               EQU              0x40010C08  ; (0x08) Port Input
+                                                             Data Register
+   36 00000000 40010C0C 
+                       GPIOB_ODR
+                               EQU              0x40010C0C  ; (0x0C) Port Outpu
+                                                            t Data Register
+   37 00000000 40010C10 
+                       GPIOB_BSRR
+                               EQU              0x40010C10  ; (0x10) Port Bit S
+                                                            et/Reset Register
+   38 00000000 40010C14 
+                       GPIOB_BRR
+                               EQU              0x40010C14  ; (0x14) Port Bit R
+                                                            eset Register
+   39 00000000 40010C18 
+                       GPIOB_LCKR
+                               EQU              0x40010C18  ; (0x18) Port Confi
+                                                            guration Lock Regis
+                                                            ter
+   40 00000000         
+   41 00000000         ;The onboard LEDS are on port C bits 8 and 9
+   42 00000000         ;PORT C GPIO - Base Addr: 0x40011000
+   43 00000000 40011000 
+                       GPIOC_CRL
+                               EQU              0x40011000  ; (0x00) Port Confi
+                                                            guration Register f
+                                                            or Px7 -> Px0
+   44 00000000 40011004 
+                       GPIOC_CRH
+                               EQU              0x40011004  ; (0x04) Port Confi
+                                                            guration Register f
+                                                            or Px15 -> Px8
+   45 00000000 40011008 
+                       GPIOC_IDR
+                               EQU              0x40011008  ; (0x08) Port Input
+                                                             Data Register
+   46 00000000 4001100C 
+                       GPIOC_ODR
+                               EQU              0x4001100C  ; (0x0C) Port Outpu
+                                                            t Data Register
+   47 00000000 40011010 
+                       GPIOC_BSRR
+                               EQU              0x40011010  ; (0x10) Port Bit S
+                                                            et/Reset Register
+   48 00000000 40011014 
+                       GPIOC_BRR
+                               EQU              0x40011014  ; (0x14) Port Bit R
+
+
+
+ARM Macro Assembler    Page 3 
+
+
+                                                            eset Register
+   49 00000000 40011018 
+                       GPIOC_LCKR
+                               EQU              0x40011018  ; (0x18) Port Confi
+                                                            guration Lock Regis
+                                                            ter
+   50 00000000         
+   51 00000000         ;Registers for configuring and enabling the clocks
+   52 00000000         ;RCC Registers - Base Addr: 0x40021000
+   53 00000000 40021000 
+                       RCC_CR  EQU              0x40021000  ; Clock Control Reg
+                                                            ister
+   54 00000000 40021004 
+                       RCC_CFGR
+                               EQU              0x40021004  ; Clock Configurati
+                                                            on Register
+   55 00000000 40021008 
+                       RCC_CIR EQU              0x40021008  ; Clock Interrupt R
+                                                            egister
+   56 00000000 4002100C 
+                       RCC_APB2RSTR
+                               EQU              0x4002100C  ; APB2 Peripheral R
+                                                            eset Register
+   57 00000000 40021010 
+                       RCC_APB1RSTR
+                               EQU              0x40021010  ; APB1 Peripheral R
+                                                            eset Register
+   58 00000000 40021014 
+                       RCC_AHBENR
+                               EQU              0x40021014  ; AHB Peripheral Cl
+                                                            ock Enable Register
+                                                            
+   59 00000000         
+   60 00000000 40021018 
+                       RCC_APB2ENR
+                               EQU              0x40021018  ; APB2 Peripheral C
+                                                            lock Enable Registe
+                                                            r  -- Used
+   61 00000000         
+   62 00000000 4002101C 
+                       RCC_APB1ENR
+                               EQU              0x4002101C  ; APB1 Peripheral C
+                                                            lock Enable Registe
+                                                            r
+   63 00000000 40021020 
+                       RCC_BDCR
+                               EQU              0x40021020  ; Backup Domain Con
+                                                            trol Register
+   64 00000000 40021024 
+                       RCC_CSR EQU              0x40021024  ; Control/Status Re
+                                                            gister
+   65 00000000 4002102C 
+                       RCC_CFGR2
+                               EQU              0x4002102C  ; Clock Configurati
+                                                            on Register 2
+   66 00000000         
+   67 00000000         ; Times for delay routines
+   68 00000000         
+   69 00000000 00055730 
+
+
+
+ARM Macro Assembler    Page 4 
+
+
+                       DELAYTIME
+                               EQU              350000      ; TIMER
+   70 00000000 000927C0 
+                       PDTIME  EQU              600000      ; TIMER
+   71 00000000 0007A120 
+                       PDTIME2 EQU              500000      ; TIMER
+   72 00000000 000B71B0 
+                       GAMETIME
+                               EQU              750000      ; GameWaitTime
+   73 00000000         ; Vector Table Mapped to Address 0 at Reset
+   74 00000000                 AREA             RESET, Data, READONLY
+   75 00000000                 EXPORT           __Vectors
+   76 00000000         
+   77 00000000 20001000 
+                       __Vectors
+                               DCD              INITIAL_MSP ; stack pointer val
+                                                            ue when stack is em
+                                                            pty
+   78 00000004 00000000        DCD              Reset_Handler ; reset vector
+   79 00000008         
+   80 00000008                 AREA             MYCODE, CODE, READONLY
+   81 00000000                 EXPORT           Reset_Handler
+   82 00000000                 ENTRY
+   83 00000000         
+   84 00000000         Reset_Handler
+                               PROC
+   85 00000000         
+   86 00000000         
+   87 00000000 F7FF FFFE       BL               GPIO_ClockInit
+   88 00000004 F7FF FFFE       BL               GPIO_init
+   89 00000008 F7FF FFFE       BL               IDLE
+   90 0000000C         
+   91 0000000C         
+   92 0000000C                 ENDP
+   93 0000000C         ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+   94 0000000C         ;; Subroutines
+   95 0000000C         ;;
+   96 0000000C         ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+   97 0000000C         
+   98 0000000C         
+   99 0000000C         
+  100 0000000C         ;;;;;;;;;;;;;;;;;;;;;;
+  101 0000000C         ;; Turn on clocks
+  102 0000000C         ;;
+  103 0000000C         ;;
+  104 0000000C         ;;;;;;;;;;;;;;;;;;;;;;
+  105 0000000C         GPIO_ClockInit
+                               PROC
+  106 0000000C 4E25            LDR              R6, =RCC_APB2ENR
+  107 0000000E 6830            LDR              R0, [R6]    ;
+  108 00000010 F040 003C       ORR              R0, #0x3C
+  109 00000014 6030            STR              R0, [R6]
+  110 00000016 F04F 0C01       LDR              R12, = 0x1  ;
+  111 0000001A         
+  112 0000001A         
+  113 0000001A 4770            BX               LR
+  114 0000001C                 ALIGN
+  115 0000001C                 ENDP
+  116 0000001C         GPIO_init
+
+
+
+ARM Macro Assembler    Page 5 
+
+
+                               PROC
+  117 0000001C F04F 3244       LDR              R2,= 0x44444444
+  118 00000020 4F21            LDR              R7,=GPIOA_CRH
+  119 00000022 6839            LDR              R1, [R7]    ;
+  120 00000024 603A            STR              R2, [R7]
+  121 00000026 4F21            LDR              R7,= GPIOB_CRH ;
+  122 00000028 6839            LDR              R1, [R7]    ;
+  123 0000002A         
+  124 0000002A         
+  125 0000002A 4770            BX               LR
+  126 0000002C                 ALIGN
+  127 0000002C                 ENDP
+  128 0000002C         
+  129 0000002C         ;;;;;;;;;;;;;;;;;;;;;;;;;
+  130 0000002C         ;;; Idle State - UC1 and UC2;
+  131 0000002C         ;;; 
+  132 0000002C         ;;;
+  133 0000002C         ;;;
+  134 0000002C         ; ENEL 384 Pushbuttons: SW2(Red): PB8, SW3(Black): PB9, 
+                       SW4(Blue): PC12 *****NEW for 2015**** SW5(Green): PA5
+  135 0000002C         ; ENEL 384 board LEDs: D1 - PA9, D2 - PA10, D3 - PA11, D
+                       4 - PA12
+  136 0000002C         ;;;;;;;;;;;;;;;;;;;;;;;;;
+  137 0000002C         
+  138 0000002C         
+  139 0000002C         
+  140 0000002C         
+  141 0000002C         
+  142 0000002C         
+  143 0000002C         
+  144 0000002C         ;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  145 0000002C         ;; This IDLE State will constantly flash 
+  146 0000002C         ;; a pattern of lights from 
+  147 0000002C         ;; left to right in sequence 
+  148 0000002C         ;;until a button is pushed
+  149 0000002C         ;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  150 0000002C         
+  151 0000002C         
+  152 0000002C         IDLE    PROC
+  153 0000002C B500            PUSH             {LR}
+  154 0000002E         
+  155 0000002E F04F 0130       LDR              R1,= 0x30   ;
+  156 00000032         GameWaitPattern
+  157 00000032         
+  158 00000032 481D            LDR              R0,= GPIOA_CRH ;
+  159 00000034 6001            STR              R1, [R0]    ;
+  160 00000036 F8DF 8078       LDR              R8,= DELAYTIME
+  161 0000003A F7FF FFFE       BL               oneSecondDelay
+  162 0000003E         
+  163 0000003E         
+  164 0000003E         return
+  165 0000003E F5B1 3F40       CMP              R1, #0x30000 ; ;; Since we turn
+                                                             on the light in se
+                                                            quence, we must res
+                                                            et back to the firs
+                                                            t light at the end.
+                                                            
+  166 00000042 BF08 2103       MOVEQ            R1, #0x3    ;  ;; This does exa
+                                                            ctly that by taking
+
+
+
+ARM Macro Assembler    Page 6 
+
+
+                                                             in the location of
+                                                             which light we're 
+                                                            at. then resets it.
+                                                            
+  167 00000046 EA4F 1101       LSL              R1, R1, #0x4 ;
+  168 0000004A 4A1A            LDR              R2,= GPIOB_IDR ; Loading in the
+                                                             input for the Push
+                                                            Buttons assigned at
+                                                             Port B;
+  169 0000004C 6812            LDR              R2, [R2]    ; 
+  170 0000004E EA4F 2212       LSR              R2, R2, #8  ; ;; We isolate the
+                                                             bits corresponding
+                                                             to a button press 
+                                                            from either Red or 
+                                                            Black.
+  171 00000052 2ADF            CMP              R2, 0xDF    ;
+  172 00000054 DBFE            BLT              TurnOnLight
+  173 00000056 F04F 0200       LDR              R2,= 0x0    ;
+  174 0000005A 4A17            LDR              R2,= GPIOC_IDR ; ;; Check Blue 
+                                                            Button at PC12
+  175 0000005C 6812            LDR              R2, [R2]    ;
+  176 0000005E EA4F 3212       LSR              R2, R2, #12 ;
+  177 00000062 2A0E            CMP              R2, 0xE     ;
+  178 00000064 D0FE            BEQ              TurnOnLight
+  179 00000066 F04F 0200       LDR              R2,= 0x0    ;
+  180 0000006A 4A14            LDR              R2,= GPIOA_IDR ;; Check Green B
+                                                            utton at PA5
+  181 0000006C 6812            LDR              R2, [R2]    ;
+  182 0000006E EA4F 1252       LSR              R2, R2, #5  ;
+  183 00000072 F002 0201       AND              R2, R2, 0x1 ;
+  184 00000076 B152            CBZ              R2, TurnOnLight ;
+  185 00000078 F85D EB04       POP              {LR}        ;
+  186 0000007C E7D9            B                GameWaitPattern
+  187 0000007E 00 00           ALIGN
+  188 00000080                 ENDP
+  189 00000080         oneSecondDelay
+                               PROC
+  190 00000080 F1A8 0801       SUB              R8,R8,#0x1  ;
+  191 00000084 F1B8 0F00       CMP              R8, #0      ;
+  192 00000088 DD00            BLE              endDelay
+  193 0000008A DCFE            BGT              oneSecondDelay
+  194 0000008C                 ALIGN
+  195 0000008C                 ENDP
+  196 0000008C         endDelay
+  197 0000008C 4770            BX               LR          ;
+  198 0000008E         
+  199 0000008E         
+  200 0000008E         TurnOnLight
+                               PROC
+  201 0000008E B500            PUSH             {LR}        ;
+  202 00000090 490B            LDR              R1,= 0x33330 ;
+  203 00000092 4A05            LDR              R2,= GPIOA_CRH ;
+  204 00000094 6011            STR              R1, [R2]    ;
+  205 00000096 F44F 2880       LDR              R8,= 0x40000 ;
+  206 0000009A F7FF FFFE       BL               oneSecondDelay ;
+  207 0000009E         
+  208 0000009E         
+  209 0000009E         
+  210 0000009E F85D EB04       POP              {LR}
+
+
+
+ARM Macro Assembler    Page 7 
+
+
+  211 000000A2         
+  212 000000A2         
+  213 000000A2         
+  214 000000A2 00 00           ALIGN
+  215 000000A4                 ENDP
+  216 000000A4         
+  217 000000A4         
+  218 000000A4         
+  219 000000A4         
+  220 000000A4         Finish
+  221 000000A4         
+  222 000000A4                 END
+              40021018 
+              40010804 
+              40010C04 
+              00055730 
+              40010C08 
+              40011008 
+              40010808 
+              00033330 
+Command Line: --debug --xref --diag_suppress=9931 --cpu=Cortex-M3 --apcs=interw
+ork --depend=.\objects\fp1.d -o.\objects\fp1.o -IC:\Users\shrey\Documents\Cours
+es\ENSE352\Whac-A-Mole\RTE -IC:\Keil_v5\ARM\PACK\Keil\STM32F1xx_DFP\2.1.0\Devic
+e\Include -IC:\Keil_v5\ARM\CMSIS\Include --predefine="__EVAL SETA 1" --predefin
+e="__UVISION_VERSION SETA 521" --predefine="STM32F10X_MD_VL SETA 1" --list=.\li
+stings\fp1.lst FP1.s
+
+
+
+ARM Macro Assembler    Page 1 Alphabetic symbol ordering
+Relocatable symbols
+
+RESET 00000000
+
+Symbol: RESET
+   Definitions
+      At line 74 in file FP1.s
+   Uses
+      None
+Comment: RESET unused
+__Vectors 00000000
+
+Symbol: __Vectors
+   Definitions
+      At line 77 in file FP1.s
+   Uses
+      At line 75 in file FP1.s
+Comment: __Vectors used once
+2 symbols
+
+
+
+ARM Macro Assembler    Page 1 Alphabetic symbol ordering
+Relocatable symbols
+
+Finish 000000A4
+
+Symbol: Finish
+   Definitions
+      At line 220 in file FP1.s
+   Uses
+      None
+Comment: Finish unused
+GPIO_ClockInit 0000000C
+
+Symbol: GPIO_ClockInit
+   Definitions
+      At line 105 in file FP1.s
+   Uses
+      At line 87 in file FP1.s
+Comment: GPIO_ClockInit used once
+GPIO_init 0000001C
+
+Symbol: GPIO_init
+   Definitions
+      At line 116 in file FP1.s
+   Uses
+      At line 88 in file FP1.s
+Comment: GPIO_init used once
+GameWaitPattern 00000032
+
+Symbol: GameWaitPattern
+   Definitions
+      At line 156 in file FP1.s
+   Uses
+      At line 186 in file FP1.s
+Comment: GameWaitPattern used once
+IDLE 0000002C
+
+Symbol: IDLE
+   Definitions
+      At line 152 in file FP1.s
+   Uses
+      At line 89 in file FP1.s
+Comment: IDLE used once
+MYCODE 00000000
+
+Symbol: MYCODE
+   Definitions
+      At line 80 in file FP1.s
+   Uses
+      None
+Comment: MYCODE unused
+Reset_Handler 00000000
+
+Symbol: Reset_Handler
+   Definitions
+      At line 84 in file FP1.s
+   Uses
+      At line 78 in file FP1.s
+      At line 81 in file FP1.s
+
+TurnOnLight 0000008E
+
+
+
+
+ARM Macro Assembler    Page 2 Alphabetic symbol ordering
+Relocatable symbols
+
+Symbol: TurnOnLight
+   Definitions
+      At line 200 in file FP1.s
+   Uses
+      At line 172 in file FP1.s
+      At line 178 in file FP1.s
+      At line 184 in file FP1.s
+
+endDelay 0000008C
+
+Symbol: endDelay
+   Definitions
+      At line 196 in file FP1.s
+   Uses
+      At line 192 in file FP1.s
+Comment: endDelay used once
+oneSecondDelay 00000080
+
+Symbol: oneSecondDelay
+   Definitions
+      At line 189 in file FP1.s
+   Uses
+      At line 161 in file FP1.s
+      At line 193 in file FP1.s
+      At line 206 in file FP1.s
+
+return 0000003E
+
+Symbol: return
+   Definitions
+      At line 164 in file FP1.s
+   Uses
+      None
+Comment: return unused
+11 symbols
+
+
+
+ARM Macro Assembler    Page 1 Alphabetic symbol ordering
+Absolute symbols
+
+DELAYTIME 00055730
+
+Symbol: DELAYTIME
+   Definitions
+      At line 69 in file FP1.s
+   Uses
+      At line 160 in file FP1.s
+Comment: DELAYTIME used once
+GAMETIME 000B71B0
+
+Symbol: GAMETIME
+   Definitions
+      At line 72 in file FP1.s
+   Uses
+      None
+Comment: GAMETIME unused
+GPIOA_BRR 40010814
+
+Symbol: GPIOA_BRR
+   Definitions
+      At line 29 in file FP1.s
+   Uses
+      None
+Comment: GPIOA_BRR unused
+GPIOA_BSRR 40010810
+
+Symbol: GPIOA_BSRR
+   Definitions
+      At line 28 in file FP1.s
+   Uses
+      None
+Comment: GPIOA_BSRR unused
+GPIOA_CRH 40010804
+
+Symbol: GPIOA_CRH
+   Definitions
+      At line 25 in file FP1.s
+   Uses
+      At line 118 in file FP1.s
+      At line 158 in file FP1.s
+      At line 203 in file FP1.s
+
+GPIOA_CRL 40010800
+
+Symbol: GPIOA_CRL
+   Definitions
+      At line 24 in file FP1.s
+   Uses
+      None
+Comment: GPIOA_CRL unused
+GPIOA_IDR 40010808
+
+Symbol: GPIOA_IDR
+   Definitions
+      At line 26 in file FP1.s
+   Uses
+      At line 180 in file FP1.s
+Comment: GPIOA_IDR used once
+GPIOA_LCKR 40010818
+
+
+
+ARM Macro Assembler    Page 2 Alphabetic symbol ordering
+Absolute symbols
+
+
+Symbol: GPIOA_LCKR
+   Definitions
+      At line 30 in file FP1.s
+   Uses
+      None
+Comment: GPIOA_LCKR unused
+GPIOA_ODR 4001080C
+
+Symbol: GPIOA_ODR
+   Definitions
+      At line 27 in file FP1.s
+   Uses
+      None
+Comment: GPIOA_ODR unused
+GPIOB_BRR 40010C14
+
+Symbol: GPIOB_BRR
+   Definitions
+      At line 38 in file FP1.s
+   Uses
+      None
+Comment: GPIOB_BRR unused
+GPIOB_BSRR 40010C10
+
+Symbol: GPIOB_BSRR
+   Definitions
+      At line 37 in file FP1.s
+   Uses
+      None
+Comment: GPIOB_BSRR unused
+GPIOB_CRH 40010C04
+
+Symbol: GPIOB_CRH
+   Definitions
+      At line 34 in file FP1.s
+   Uses
+      At line 121 in file FP1.s
+Comment: GPIOB_CRH used once
+GPIOB_CRL 40010C00
+
+Symbol: GPIOB_CRL
+   Definitions
+      At line 33 in file FP1.s
+   Uses
+      None
+Comment: GPIOB_CRL unused
+GPIOB_IDR 40010C08
+
+Symbol: GPIOB_IDR
+   Definitions
+      At line 35 in file FP1.s
+   Uses
+      At line 168 in file FP1.s
+Comment: GPIOB_IDR used once
+GPIOB_LCKR 40010C18
+
+Symbol: GPIOB_LCKR
+   Definitions
+
+
+
+ARM Macro Assembler    Page 3 Alphabetic symbol ordering
+Absolute symbols
+
+      At line 39 in file FP1.s
+   Uses
+      None
+Comment: GPIOB_LCKR unused
+GPIOB_ODR 40010C0C
+
+Symbol: GPIOB_ODR
+   Definitions
+      At line 36 in file FP1.s
+   Uses
+      None
+Comment: GPIOB_ODR unused
+GPIOC_BRR 40011014
+
+Symbol: GPIOC_BRR
+   Definitions
+      At line 48 in file FP1.s
+   Uses
+      None
+Comment: GPIOC_BRR unused
+GPIOC_BSRR 40011010
+
+Symbol: GPIOC_BSRR
+   Definitions
+      At line 47 in file FP1.s
+   Uses
+      None
+Comment: GPIOC_BSRR unused
+GPIOC_CRH 40011004
+
+Symbol: GPIOC_CRH
+   Definitions
+      At line 44 in file FP1.s
+   Uses
+      None
+Comment: GPIOC_CRH unused
+GPIOC_CRL 40011000
+
+Symbol: GPIOC_CRL
+   Definitions
+      At line 43 in file FP1.s
+   Uses
+      None
+Comment: GPIOC_CRL unused
+GPIOC_IDR 40011008
+
+Symbol: GPIOC_IDR
+   Definitions
+      At line 45 in file FP1.s
+   Uses
+      At line 174 in file FP1.s
+Comment: GPIOC_IDR used once
+GPIOC_LCKR 40011018
+
+Symbol: GPIOC_LCKR
+   Definitions
+      At line 49 in file FP1.s
+   Uses
+      None
+
+
+
+ARM Macro Assembler    Page 4 Alphabetic symbol ordering
+Absolute symbols
+
+Comment: GPIOC_LCKR unused
+GPIOC_ODR 4001100C
+
+Symbol: GPIOC_ODR
+   Definitions
+      At line 46 in file FP1.s
+   Uses
+      None
+Comment: GPIOC_ODR unused
+INITIAL_MSP 20001000
+
+Symbol: INITIAL_MSP
+   Definitions
+      At line 20 in file FP1.s
+   Uses
+      At line 77 in file FP1.s
+Comment: INITIAL_MSP used once
+PDTIME 000927C0
+
+Symbol: PDTIME
+   Definitions
+      At line 70 in file FP1.s
+   Uses
+      None
+Comment: PDTIME unused
+PDTIME2 0007A120
+
+Symbol: PDTIME2
+   Definitions
+      At line 71 in file FP1.s
+   Uses
+      None
+Comment: PDTIME2 unused
+RCC_AHBENR 40021014
+
+Symbol: RCC_AHBENR
+   Definitions
+      At line 58 in file FP1.s
+   Uses
+      None
+Comment: RCC_AHBENR unused
+RCC_APB1ENR 4002101C
+
+Symbol: RCC_APB1ENR
+   Definitions
+      At line 62 in file FP1.s
+   Uses
+      None
+Comment: RCC_APB1ENR unused
+RCC_APB1RSTR 40021010
+
+Symbol: RCC_APB1RSTR
+   Definitions
+      At line 57 in file FP1.s
+   Uses
+      None
+Comment: RCC_APB1RSTR unused
+RCC_APB2ENR 40021018
+
+
+
+
+ARM Macro Assembler    Page 5 Alphabetic symbol ordering
+Absolute symbols
+
+Symbol: RCC_APB2ENR
+   Definitions
+      At line 60 in file FP1.s
+   Uses
+      At line 106 in file FP1.s
+Comment: RCC_APB2ENR used once
+RCC_APB2RSTR 4002100C
+
+Symbol: RCC_APB2RSTR
+   Definitions
+      At line 56 in file FP1.s
+   Uses
+      None
+Comment: RCC_APB2RSTR unused
+RCC_BDCR 40021020
+
+Symbol: RCC_BDCR
+   Definitions
+      At line 63 in file FP1.s
+   Uses
+      None
+Comment: RCC_BDCR unused
+RCC_CFGR 40021004
+
+Symbol: RCC_CFGR
+   Definitions
+      At line 54 in file FP1.s
+   Uses
+      None
+Comment: RCC_CFGR unused
+RCC_CFGR2 4002102C
+
+Symbol: RCC_CFGR2
+   Definitions
+      At line 65 in file FP1.s
+   Uses
+      None
+Comment: RCC_CFGR2 unused
+RCC_CIR 40021008
+
+Symbol: RCC_CIR
+   Definitions
+      At line 55 in file FP1.s
+   Uses
+      None
+Comment: RCC_CIR unused
+RCC_CR 40021000
+
+Symbol: RCC_CR
+   Definitions
+      At line 53 in file FP1.s
+   Uses
+      None
+Comment: RCC_CR unused
+RCC_CSR 40021024
+
+Symbol: RCC_CSR
+   Definitions
+      At line 64 in file FP1.s
+
+
+
+ARM Macro Assembler    Page 6 Alphabetic symbol ordering
+Absolute symbols
+
+   Uses
+      None
+Comment: RCC_CSR unused
+37 symbols
+385 symbols in table

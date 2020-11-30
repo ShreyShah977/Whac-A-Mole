@@ -1,0 +1,6 @@
+--cpu Cortex-M3
+".\objects\fp1.o"
+--strict --scatter ".\Objects\FP1.sct"
+--summary_stderr --info summarysizes --map --xref --callgraph --symbols
+--info sizes --info totals --info unused --info veneers
+--list ".\Listings\FP1.map" -o .\Objects\FP1.axf
