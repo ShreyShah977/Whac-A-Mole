@@ -69,7 +69,7 @@ RCC_CFGR2	EQU		0x4002102C	; Clock Configuration Register 2
 DELAYTIME	EQU		300000	; TIMER
 PDTIME	EQU		600000	; TIMER
 PDTIME2	EQU		500000	; TIMER
-REACT_TIME EQU	650000	; GameWaitTime
+REACT_TIME EQU	550000	; GameWaitTime
 ; Vector Table Mapped to Address 0 at Reset
             AREA    RESET, Data, READONLY
             EXPORT  __Vectors
@@ -223,12 +223,32 @@ TimerDone
 	BX LR;
 	ENDP
 		
-		
-		
+CheckButtons PROC
+	LDR R5,= 0x0;
+	LDR R8,= GPIOB_IDR
+	LDR R5, [R8];
+	LSR R5, R5, #8;
+	AND R5, R5, #0xF;
+	EOR R5, R5, #0xF;
+	LDR R8,= GPIOC_IDR
+	LDR R4, [R8];
+	LSR R4, R4, #12;
+	CMP R4, #0xE;
+	ORREQ R5, #0x4;
+	LDR R8,= GPIOA_IDR;
+	LDR R4, [R8];
+	LSR R4, R4, #5;
+	AND R4, R4, #1;
+	CMP R4, #0x0; 
+	ORREQ R5, R5, #0x8;	
+	BX LR
+	ALIGN
+	ENDP
 		
 GameStart    PROC
 	PUSH {LR};
 	LDR R2, = 0x0;
+
 continuePlay
 	LDR R1,= 0x4444444;
 ;; Rand Generator
@@ -307,20 +327,23 @@ PreLimWait PROC
 	ALIGN
 	ENDP
 
+
 LED1  PROC
-	
 	LDR R3, = 0x30;
 	STR R3, [R7];
 	LDR R3, = 0x0;
 	LDR R6, = 0x20001000;
 	LDR R6, [R6];
-	BL GameWait;
-	LDR R8, = GPIOB_IDR
-	LDR R3, [R8];
-	LSR R3, #0x8;
-	CMP R3, #0xDE
+TimerLoop1
+	PUSH {LR}
+	BL CheckButtons
+	POP {LR}
+	CMP R5, #0x1;
 	BEQ TurnOff1;
-	BNE FailState
+	BGT FailState
+	SUB R6, R6, #1;
+	CBZ R6, FailState
+	B TimerLoop1
 	ALIGN
 	ENDP
 	
@@ -331,29 +354,40 @@ LED2  PROC
 	STR R3, [R7];
 	LDR R6, = 0x20001000;
 	LDR R6, [R6];
-	BL GameWait;
-	LDR R8, = GPIOB_IDR
-	LDR R3, [R8];
-	LSR R3, #0x8;
-	CMP R3, #0xDD                                                                                                                                                                                                
+TimerLoop2
+	PUSH {LR}
+	BL CheckButtons
+	POP {LR}
+	CMP R5, #0x2;                                                                                                                                                                                           
 	BEQ TurnOff1;
-	BNE FailState
+	CMP R5, #0x1;
+	BGE FailState
+	SUB R6, R6, #1;
+	CBZ R6, FailState
+	B TimerLoop2
 	ALIGN
 	ENDP
 		
-
+JumpWin PROC
+	B WinState
+	ALIGN
+	ENDP
 LED3  PROC
 	LDR R3, = 0x3000;
 	STR R3, [R7];
 	LDR R6, = 0x20001000;
 	LDR R6, [R6];
-	BL GameWait
-	LDR R8, = GPIOC_IDR
-	LDR R3, [R8];
-	LSR R3, R3, #12;
-	CMP R3, #0xE;
+TimerLoop3
+	PUSH {LR}
+	BL CheckButtons
+	POP {LR}
+	CMP R5, #0x4;      
 	BEQ TurnOff1;
-	BNE FailState
+	CMP R5, #0x1;
+	BGE FailState
+	SUB R6, R6, #1;
+	CBZ R6, FailState
+	B TimerLoop3
 	ALIGN
 	ENDP
 		
@@ -364,44 +398,29 @@ LED4  PROC
 	STR R3, [R7];
 	LDR R6, = 0x20001000;
 	LDR R6, [R6];
-	BL GameWait;
-	LDR R8, = GPIOA_IDR
-	LDR R3, [R8];
-	LSR R3, R3, #5;
-	AND R3, R3, #0x1;
+TimerLoop4
+	PUSH {LR}
+	BL CheckButtons
+	POP {LR}
+	CMP R5, #0x8;
+	BEQ TurnOff1;
+	CMP R5, #0x1;
+	BGE FailState;
 	CBZ R3, TurnOff1;
-	BNE FailState
-	ALIGN
-	ENDP
-
-TurnOff1  PROC
-	LDR R1, =  0x0;
-	STR R1, [R7];
-	LDR R10,= 0x200;
-	
-	LDR R6, = 0x20001000;
-	LDR R1, [R6];
-	ADD R2, R2, #1;
-	MUL R10, R10, R2;
-	SUB R1, R1, R10;
-	STR R1, [R6];
-	
-	CMP R2, #15;
-	BEQ WinState
-	BL PreLimWait;
-	B continuePlay;
+	SUB R6, R6, #1;
+	CBZ R6, FailState
+	B TimerLoop4
 	ALIGN
 	ENDP
 FailState PROC
-	
 
 	LDR R7,= GPIOA_CRH;
 	LDR R0,= 0x3;
-Failloop
 	LDR R1,= 0x33330;
 	STR R1, [R7];
 	LDR R8,= DELAYTIME
 	BL oneSecondDelay;
+Failloop
 	LDR R1,= 0x0;
 	STR R1, [R7];
 	LDR R8,= DELAYTIME
@@ -413,6 +432,25 @@ leave
 	B IDLE
 	ALIGN
 	ENDP
+TurnOff1  PROC
+	LDR R1, =  0x0;
+	STR R1, [R7];
+	LDR R10,= 0x500
+	
+	LDR R6, = 0x20001000;
+	LDR R1, [R6];
+	ADD R2, R2, #1;
+	MUL R10, R10, R2;
+	SUB R1, R1, R10;
+	STR R1, [R6];
+	
+	CMP R2, #15;
+	BEQ JumpWin
+	B continuePlay;
+	ALIGN
+	ENDP
+
+
 
 Finish
 	
