@@ -66,10 +66,10 @@ RCC_CFGR2	EQU		0x4002102C	; Clock Configuration Register 2
 
 ; Times for delay routines
         
-DELAYTIME	EQU		350000	; TIMER
+DELAYTIME	EQU		300000	; TIMER
 PDTIME	EQU		600000	; TIMER
 PDTIME2	EQU		500000	; TIMER
-GAMETIME EQU	750000	; GameWaitTime
+REACT_TIME EQU	650000	; GameWaitTime
 ; Vector Table Mapped to Address 0 at Reset
             AREA    RESET, Data, READONLY
             EXPORT  __Vectors
@@ -146,6 +146,7 @@ GPIO_init PROC
 ;; a pattern of lights from 
 ;; left to right in sequence 
 ;;until a button is pushed
+;; UC2 - Waiting for Player Loop
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
@@ -161,62 +162,229 @@ GameWaitPattern
 	BL oneSecondDelay
 	
 	
-return
+
+    BL CheckforUser
 	CMP R1, #0x30000; ;; Since we turn on the light in sequence, we must reset back to the first light at the end.
 	MOVEQ R1, #0x3;  ;; This does exactly that by taking in the location of which light we're at. then resets it.
-	LSL R1, R1, #0x4;
-	LDR R2,= GPIOB_IDR; Loading in the input for the PushButtons assigned at Port B;
-	LDR R2, [R2]; 
-	LSR R2, R2, #8; ;; We isolate the bits corresponding to a button press from either Red or Black.
-	CMP R2, 0xDF;
-	BLT TurnOnLight
-	LDR R2,= 0x0;
-	LDR R2,= GPIOC_IDR; ;; Check Blue Button at PC12
-	LDR R2, [R2];
-	LSR R2, R2, #12;
-	CMP R2, 0xE;
-	BEQ TurnOnLight
-	LDR R2,= 0x0;
-	LDR R2,= GPIOA_IDR ;; Check Green Button at PA5
-	LDR R2, [R2];
-	LSR R2, R2, #5;
-	AND R2, R2, 0x1;
-	CBZ R2, TurnOnLight;
+	LSL R1, R1, #0x4;;
+	
 	POP {LR};
 	B GameWaitPattern
 	ALIGN
 	ENDP
+CheckforUser PROC
+	LDR R2,= GPIOB_IDR; Loading in the input for the PushButtons assigned at Port B;
+	LDR R2, [R2]; 
+	LSR R2, R2, #8; ;; We isolate the bits corresponding to a button press from either Red or Black.
+	CMP R2, #0xDF;
+	BLT GameStart
+	LDR R2,= 0x0;
+	LDR R2,= GPIOC_IDR; ;; Check Blue Button at PC12
+	LDR R2, [R2];
+	LSR R2, R2, #12;
+	CMP R2, #0xE;
+	BEQ GameStart
+	LDR R2,= 0x0;
+	LDR R2,= GPIOA_IDR ;; Check Green Button at PA5
+	LDR R2, [R2];
+	LSR R2, R2, #5;
+	AND R2, R2, #0x1;
+	CBZ R2, GameStart;
+	
+	
+	BX LR;
+	ALIGN;
+	ENDP;
+		
+		
 oneSecondDelay PROC
 	SUB R8,R8,#0x1;
 	CMP R8, #0;
 	BLE endDelay
-	BGT oneSecondDelay
+	BGT oneSecondDelay 
 	ALIGN
 	ENDP
 endDelay
 	BX LR;
 
 
-TurnOnLight    PROC
+
+
+GameWait PROC
+	SUB R6, R6, #0x1;
+	CBZ R6, TimerDone
+	B GameWait
+TimerDone
+	BX LR;
+	ENDP
+		
+		
+		
+		
+GameStart    PROC
 	PUSH {LR};
-	LDR R1,= 0x33330;
-	LDR R2,= GPIOA_CRH;
-	STR R1, [R2];
-	LDR R8,= 0x40000;
+	LDR R2, = 0x0;
+continuePlay
+	LDR R1,= 0x4444444;
+;; Rand Generator
+    LDR R7, =GPIOA_CRH;
+	STR R1, [R7];
+	LDR R8, = PDTIME2;
 	BL oneSecondDelay;
+
+	LDR R10, = 0x0;
 	
+loopmain;
+;	LDR R8,= REACT_TIME;
 	
+	BL Rand;
+
 	
+	CMP R4, #0x0;
+	BEQ LED1;
+	CMP R4, #0xC0000000;
+	BEQ LED2;
+	CMP R4, #0x80000000;
+	BEQ LED3;
+	CMP R4, #0x40000000;
+	BEQ LED4;	
+	
+	LDR R10, = 0x0;
+	BNE loopmain
+
+
+FinishedWinAnim
 	POP {LR}
-	
-	
-	
+	B IDLE;
 	ALIGN
 	ENDP
 
+Rand  PROC
+;; Rand Generator
+
+	LDR R1,= 50051;
+	LDR R10, = 50051;
+	MUL R12,R1;
+	ADD R12, R10;
+	AND R4, R12, #0xC0000000;
+
+	BX LR
+	ALIGN
+	ENDP
+
+WinState  PROC
+	LDR R3,= 0x16;
+	LDR R7,= GPIOA_CRH;
+WinCycleLoop
+	LDR R1,= 0x3030;
+	STR R1, [R7];
+	LDR R8,= DELAYTIME
+	BL oneSecondDelay;
+	SUB R3, R3, #1;
+	LSL R1, R1, #4;
+	STR R1, [R7];
+	LDR R8,= DELAYTIME
+	BL oneSecondDelay;
+	SUB R3, R3, #1;
+	CBZ R3, resetBackToIDLE
+	B WinCycleLoop
+resetBackToIDLE
+	B IDLE
+	ENDP
+    ALIGN
+PreLimWait PROC
+	LDR R6, = PDTIME2;
+   	ADD R10, R10, #0x1;
+	CMP R10, R6;
+ 	BNE PreLimWait
+	BX LR;
+	ALIGN
+	ENDP
+
+LED1  PROC
+	
+	LDR R3, = 0x30;
+	STR R3, [R7];
+	LDR R3, = 0x0;
+	LDR R6,= REACT_TIME
+	BL GameWait;
+	LDR R8, = GPIOB_IDR
+	LDR R3, [R8];
+	LSR R3, #0x8;
+	CMP R3, #0xDE
+	BEQ TurnOff1;
+	B FailState
+	ALIGN
+	ENDP
+	
 
 
+LED2  PROC
+	LDR R3, = 0x300;
+	STR R3, [R7];
+	LDR R6,= REACT_TIME
+	BL GameWait;
+	LDR R8, = GPIOB_IDR
+	LDR R3, [R8];
+	LSR R3, #0x8;
+	CMP R3, #0xDD                                                                                                                                                                                                
+	BEQ TurnOff1;
+	B FailState
+	ALIGN
+	ENDP
+		
 
+LED3  PROC
+	LDR R3, = 0x3000;
+	STR R3, [R7];
+	LDR R6,= REACT_TIME
+	BL GameWait
+	LDR R8, = GPIOC_IDR
+	LDR R3, [R8];
+	AND R3, R3, #0x3000;
+	CMP R3, #0x2000;
+	BEQ TurnOff1;
+	B FailState
+	ALIGN
+	ENDP
+		
+
+	ALIGN
+LED4  PROC
+	LDR R3, = 0x30000;
+	STR R3, [R7];
+	LDR R6,= REACT_TIME
+	BL GameWait;
+	LDR R8, = GPIOA_IDR
+	LDR R3, [R8];
+	LSR R3, R3, #5;
+	AND R3, R3, #0x1;
+	CBZ R3, TurnOff1;
+	B FailState
+	ALIGN
+	ENDP
+TurnOff1  PROC
+	LDR R1, =  0x0;
+	STR R1, [R7];
+	LDR R10,= 0x0;
+	ADD R2, R2, #1;
+	CMP R2, #15;
+	BEQ WinState
+	BL PreLimWait;
+	B continuePlay;
+	ALIGN
+	ENDP
+
+FailState PROC
+	
+	LDR R1,= 0x33330;
+	LDR R7,= GPIOA_CRH;
+	STR R1, [R7];
+	BL PreLimWait;
+	
+	B IDLE
+	ALIGN
+	ENDP
 Finish
 	
 	END
