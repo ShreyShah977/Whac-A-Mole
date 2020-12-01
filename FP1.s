@@ -151,7 +151,12 @@ GPIO_init PROC
 
 
 IDLE PROC
+	LDR R8,= 0x20001000;
+	LDR R0,= REACT_TIME;
+	STR R0, [R8];
 	PUSH {LR}
+	LDR R0,= 0x0;
+	LDR R8,= 0x0;
 
 	LDR R1,= 0x30;
 GameWaitPattern
@@ -235,7 +240,7 @@ continuePlay
 	LDR R10, = 0x0;
 	
 loopmain;
-;	LDR R8,= REACT_TIME;
+
 	
 	BL Rand;
 
@@ -292,6 +297,7 @@ resetBackToIDLE
 	B IDLE
 	ENDP
     ALIGN
+
 PreLimWait PROC
 	LDR R6, = PDTIME2;
    	ADD R10, R10, #0x1;
@@ -306,14 +312,15 @@ LED1  PROC
 	LDR R3, = 0x30;
 	STR R3, [R7];
 	LDR R3, = 0x0;
-	LDR R6,= REACT_TIME
+	LDR R6, = 0x20001000;
+	LDR R6, [R6];
 	BL GameWait;
 	LDR R8, = GPIOB_IDR
 	LDR R3, [R8];
 	LSR R3, #0x8;
 	CMP R3, #0xDE
 	BEQ TurnOff1;
-	B FailState
+	BNE FailState
 	ALIGN
 	ENDP
 	
@@ -322,14 +329,15 @@ LED1  PROC
 LED2  PROC
 	LDR R3, = 0x300;
 	STR R3, [R7];
-	LDR R6,= REACT_TIME
+	LDR R6, = 0x20001000;
+	LDR R6, [R6];
 	BL GameWait;
 	LDR R8, = GPIOB_IDR
 	LDR R3, [R8];
 	LSR R3, #0x8;
 	CMP R3, #0xDD                                                                                                                                                                                                
 	BEQ TurnOff1;
-	B FailState
+	BNE FailState
 	ALIGN
 	ENDP
 		
@@ -337,14 +345,15 @@ LED2  PROC
 LED3  PROC
 	LDR R3, = 0x3000;
 	STR R3, [R7];
-	LDR R6,= REACT_TIME
+	LDR R6, = 0x20001000;
+	LDR R6, [R6];
 	BL GameWait
 	LDR R8, = GPIOC_IDR
 	LDR R3, [R8];
-	AND R3, R3, #0x3000;
-	CMP R3, #0x2000;
+	LSR R3, R3, #12;
+	CMP R3, #0xE;
 	BEQ TurnOff1;
-	B FailState
+	BNE FailState
 	ALIGN
 	ENDP
 		
@@ -353,38 +362,58 @@ LED3  PROC
 LED4  PROC
 	LDR R3, = 0x30000;
 	STR R3, [R7];
-	LDR R6,= REACT_TIME
+	LDR R6, = 0x20001000;
+	LDR R6, [R6];
 	BL GameWait;
 	LDR R8, = GPIOA_IDR
 	LDR R3, [R8];
 	LSR R3, R3, #5;
 	AND R3, R3, #0x1;
 	CBZ R3, TurnOff1;
-	B FailState
+	BNE FailState
 	ALIGN
 	ENDP
+
 TurnOff1  PROC
 	LDR R1, =  0x0;
 	STR R1, [R7];
-	LDR R10,= 0x0;
+	LDR R10,= 0x200;
+	
+	LDR R6, = 0x20001000;
+	LDR R1, [R6];
 	ADD R2, R2, #1;
+	MUL R10, R10, R2;
+	SUB R1, R1, R10;
+	STR R1, [R6];
+	
 	CMP R2, #15;
 	BEQ WinState
 	BL PreLimWait;
 	B continuePlay;
 	ALIGN
 	ENDP
-
 FailState PROC
 	
-	LDR R1,= 0x33330;
+
 	LDR R7,= GPIOA_CRH;
+	LDR R0,= 0x3;
+Failloop
+	LDR R1,= 0x33330;
 	STR R1, [R7];
-	BL PreLimWait;
-	
+	LDR R8,= DELAYTIME
+	BL oneSecondDelay;
+	LDR R1,= 0x0;
+	STR R1, [R7];
+	LDR R8,= DELAYTIME
+	BL oneSecondDelay;
+	SUB R0, R0, #1;
+	CBZ R0, leave
+	B Failloop
+leave
 	B IDLE
 	ALIGN
 	ENDP
+
 Finish
 	
 	END
