@@ -9,8 +9,10 @@
 ;;  Class: ENSE 352 Fall 2020
 ;;
 ;;  This file contains all the code for the Whac-A-Mole arcade game. Each State is documented in detail with reference to the PDF Handout.
-;;  
+;;  Please read the README.txt file before starting to get a high level overview
 ;;
+;;  IMPORTANT NOTE: This code is for the older generation of the board. The board variant is the STM32F100RB, and the project for uvision must be initalized with that in mind.
+;; 	
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
