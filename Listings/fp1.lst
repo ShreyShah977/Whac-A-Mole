@@ -13,562 +13,712 @@ ARM Macro Assembler    Page 1
     7 00000000         ;;  SID: 200377176
     8 00000000         ;;  Date: November 27th 2020
     9 00000000         ;;  Class: ENSE 352 Fall 2020
-   10 00000000         ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-   11 00000000         
-   12 00000000         
-   13 00000000         ;;; Directives
-   14 00000000                 PRESERVE8
-   15 00000000                 THUMB
+   10 00000000         ;;
+   11 00000000         ;;  This file contains all the code for the Whac-A-Mole 
+                       arcade game. Each State is documented in detail with ref
+                       erence to the PDF Handout.
+   12 00000000         ;;  
+   13 00000000         ;;
+   14 00000000         ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+   15 00000000         
    16 00000000         
-   17 00000000         
-   18 00000000         ;;; Equates
-   19 00000000         
-   20 00000000 20001000 
+   17 00000000         ;;; Directives
+   18 00000000                 PRESERVE8
+   19 00000000                 THUMB
+   20 00000000         
+   21 00000000         
+   22 00000000         ;;; Equates
+   23 00000000         
+   24 00000000 20001000 
                        INITIAL_MSP
                                EQU              0x20001000  ; Initial Main Stac
                                                             k Pointer Value
-   21 00000000         
-   22 00000000         
-   23 00000000         ;PORT A GPIO - Base Addr: 0x40010800
-   24 00000000 40010800 
+   25 00000000         
+   26 00000000         
+   27 00000000         ;PORT A GPIO - Base Addr: 0x40010800
+   28 00000000 40010800 
                        GPIOA_CRL
                                EQU              0x40010800  ; (0x00) Port Confi
                                                             guration Register f
                                                             or Px7 -> Px0
-   25 00000000 40010804 
+   29 00000000 40010804 
                        GPIOA_CRH
                                EQU              0x40010804  ; (0x04) Port Confi
                                                             guration Register f
                                                             or Px15 -> Px8
-   26 00000000 40010808 
+   30 00000000 40010808 
                        GPIOA_IDR
                                EQU              0x40010808  ; (0x08) Port Input
                                                              Data Register
-   27 00000000 4001080C 
+   31 00000000 4001080C 
                        GPIOA_ODR
                                EQU              0x4001080C  ; (0x0C) Port Outpu
                                                             t Data Register
-   28 00000000 40010810 
+   32 00000000 40010810 
                        GPIOA_BSRR
                                EQU              0x40010810  ; (0x10) Port Bit S
                                                             et/Reset Register
-   29 00000000 40010814 
+   33 00000000 40010814 
                        GPIOA_BRR
                                EQU              0x40010814  ; (0x14) Port Bit R
                                                             eset Register
-   30 00000000 40010818 
-                       GPIOA_LCKR
-                               EQU              0x40010818  ; (0x18) Port Confi
-                                                            guration Lock Regis
-                                                            ter
-   31 00000000         
-   32 00000000         ;PORT B GPIO - Base Addr: 0x40010C00
+   34 00000000 40010818 
 
 
 
 ARM Macro Assembler    Page 2 
 
 
-   33 00000000 40010C00 
+                       GPIOA_LCKR
+                               EQU              0x40010818  ; (0x18) Port Confi
+                                                            guration Lock Regis
+                                                            ter
+   35 00000000         
+   36 00000000         ;PORT B GPIO - Base Addr: 0x40010C00
+   37 00000000 40010C00 
                        GPIOB_CRL
                                EQU              0x40010C00  ; (0x00) Port Confi
                                                             guration Register f
                                                             or Px7 -> Px0
-   34 00000000 40010C04 
+   38 00000000 40010C04 
                        GPIOB_CRH
                                EQU              0x40010C04  ; (0x04) Port Confi
                                                             guration Register f
                                                             or Px15 -> Px8
-   35 00000000 40010C08 
+   39 00000000 40010C08 
                        GPIOB_IDR
                                EQU              0x40010C08  ; (0x08) Port Input
                                                              Data Register
-   36 00000000 40010C0C 
+   40 00000000 40010C0C 
                        GPIOB_ODR
                                EQU              0x40010C0C  ; (0x0C) Port Outpu
                                                             t Data Register
-   37 00000000 40010C10 
+   41 00000000 40010C10 
                        GPIOB_BSRR
                                EQU              0x40010C10  ; (0x10) Port Bit S
                                                             et/Reset Register
-   38 00000000 40010C14 
+   42 00000000 40010C14 
                        GPIOB_BRR
                                EQU              0x40010C14  ; (0x14) Port Bit R
                                                             eset Register
-   39 00000000 40010C18 
+   43 00000000 40010C18 
                        GPIOB_LCKR
                                EQU              0x40010C18  ; (0x18) Port Confi
                                                             guration Lock Regis
                                                             ter
-   40 00000000         
-   41 00000000         ;The onboard LEDS are on port C bits 8 and 9
-   42 00000000         ;PORT C GPIO - Base Addr: 0x40011000
-   43 00000000 40011000 
+   44 00000000         
+   45 00000000         ;The onboard LEDS are on port C bits 8 and 9
+   46 00000000         ;PORT C GPIO - Base Addr: 0x40011000
+   47 00000000 40011000 
                        GPIOC_CRL
                                EQU              0x40011000  ; (0x00) Port Confi
                                                             guration Register f
                                                             or Px7 -> Px0
-   44 00000000 40011004 
+   48 00000000 40011004 
                        GPIOC_CRH
                                EQU              0x40011004  ; (0x04) Port Confi
                                                             guration Register f
                                                             or Px15 -> Px8
-   45 00000000 40011008 
+   49 00000000 40011008 
                        GPIOC_IDR
                                EQU              0x40011008  ; (0x08) Port Input
                                                              Data Register
-   46 00000000 4001100C 
+   50 00000000 4001100C 
                        GPIOC_ODR
                                EQU              0x4001100C  ; (0x0C) Port Outpu
                                                             t Data Register
-   47 00000000 40011010 
-                       GPIOC_BSRR
-                               EQU              0x40011010  ; (0x10) Port Bit S
-                                                            et/Reset Register
-   48 00000000 40011014 
-                       GPIOC_BRR
-                               EQU              0x40011014  ; (0x14) Port Bit R
+   51 00000000 40011010 
 
 
 
 ARM Macro Assembler    Page 3 
 
 
+                       GPIOC_BSRR
+                               EQU              0x40011010  ; (0x10) Port Bit S
+                                                            et/Reset Register
+   52 00000000 40011014 
+                       GPIOC_BRR
+                               EQU              0x40011014  ; (0x14) Port Bit R
                                                             eset Register
-   49 00000000 40011018 
+   53 00000000 40011018 
                        GPIOC_LCKR
                                EQU              0x40011018  ; (0x18) Port Confi
                                                             guration Lock Regis
                                                             ter
-   50 00000000         
-   51 00000000         ;Registers for configuring and enabling the clocks
-   52 00000000         ;RCC Registers - Base Addr: 0x40021000
-   53 00000000 40021000 
+   54 00000000         
+   55 00000000         ;Registers for configuring and enabling the clocks
+   56 00000000         ;RCC Registers - Base Addr: 0x40021000
+   57 00000000 40021000 
                        RCC_CR  EQU              0x40021000  ; Clock Control Reg
                                                             ister
-   54 00000000 40021004 
+   58 00000000 40021004 
                        RCC_CFGR
                                EQU              0x40021004  ; Clock Configurati
                                                             on Register
-   55 00000000 40021008 
+   59 00000000 40021008 
                        RCC_CIR EQU              0x40021008  ; Clock Interrupt R
                                                             egister
-   56 00000000 4002100C 
+   60 00000000 4002100C 
                        RCC_APB2RSTR
                                EQU              0x4002100C  ; APB2 Peripheral R
                                                             eset Register
-   57 00000000 40021010 
+   61 00000000 40021010 
                        RCC_APB1RSTR
                                EQU              0x40021010  ; APB1 Peripheral R
                                                             eset Register
-   58 00000000 40021014 
+   62 00000000 40021014 
                        RCC_AHBENR
                                EQU              0x40021014  ; AHB Peripheral Cl
                                                             ock Enable Register
                                                             
-   59 00000000         
-   60 00000000 40021018 
+   63 00000000         
+   64 00000000 40021018 
                        RCC_APB2ENR
                                EQU              0x40021018  ; APB2 Peripheral C
                                                             lock Enable Registe
                                                             r  -- Used
-   61 00000000         
-   62 00000000 4002101C 
+   65 00000000         
+   66 00000000 4002101C 
                        RCC_APB1ENR
                                EQU              0x4002101C  ; APB1 Peripheral C
                                                             lock Enable Registe
                                                             r
-   63 00000000 40021020 
+   67 00000000 40021020 
                        RCC_BDCR
                                EQU              0x40021020  ; Backup Domain Con
                                                             trol Register
-   64 00000000 40021024 
+   68 00000000 40021024 
                        RCC_CSR EQU              0x40021024  ; Control/Status Re
                                                             gister
-   65 00000000 4002102C 
+   69 00000000 4002102C 
                        RCC_CFGR2
-                               EQU              0x4002102C  ; Clock Configurati
-                                                            on Register 2
-   66 00000000         
-   67 00000000         ; Times for delay routines
-   68 00000000         
-   69 00000000 00030D40 
 
 
 
 ARM Macro Assembler    Page 4 
 
 
+                               EQU              0x4002102C  ; Clock Configurati
+                                                            on Register 2
+   70 00000000         
+   71 00000000         ; Times for delay routines
+   72 00000000         
+   73 00000000 00030D40 
                        DELAYTIME
                                EQU              200000      ; TIMER
-   70 00000000 000927C0 
+   74 00000000 000927C0 
                        PDTIME  EQU              600000      ; TIMER
-   71 00000000 0007A120 
+   75 00000000 0007A120 
                        PDTIME2 EQU              500000      ; TIMER
-   72 00000000 00086470 
+   76 00000000 00055730 
                        REACT_TIME
-                               EQU              550000      ; GameWaitTime
-   73 00000000 00055730 
+                               EQU              350000      ; GameWaitTime
+   77 00000000 00055730 
                        FAIL_TIME
                                EQU              350000      ; Fail Sequence Lig
                                                             ht Time
-   74 00000000         ; Vector Table Mapped to Address 0 at Reset
-   75 00000000                 AREA             RESET, Data, READONLY
-   76 00000000                 EXPORT           __Vectors
-   77 00000000         
-   78 00000000 20001000 
+   78 00000000         ; Vector Table Mapped to Address 0 at Reset
+   79 00000000                 AREA             RESET, Data, READONLY
+   80 00000000                 EXPORT           __Vectors
+   81 00000000         
+   82 00000000 20001000 
                        __Vectors
                                DCD              INITIAL_MSP ; stack pointer val
                                                             ue when stack is em
                                                             pty
-   79 00000004 00000000        DCD              Reset_Handler ; reset vector
-   80 00000008         
-   81 00000008                 AREA             MYCODE, CODE, READONLY
-   82 00000000                 EXPORT           Reset_Handler
-   83 00000000                 ENTRY
-   84 00000000         
-   85 00000000         Reset_Handler
+   83 00000004 00000000        DCD              Reset_Handler ; reset vector
+   84 00000008         
+   85 00000008                 AREA             MYCODE, CODE, READONLY
+   86 00000000                 EXPORT           Reset_Handler
+   87 00000000                 ENTRY
+   88 00000000         
+   89 00000000         Reset_Handler
                                PROC
-   86 00000000         
-   87 00000000         
-   88 00000000 F7FF FFFE       BL               GPIO_ClockInit
-   89 00000004 F7FF FFFE       BL               GPIO_init
-   90 00000008 F7FF FFFE       BL               IDLE
-   91 0000000C         
-   92 0000000C         
-   93 0000000C                 ENDP
-   94 0000000C         ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-   95 0000000C         ;; Subroutines
-   96 0000000C         ;;
-   97 0000000C         ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+   90 00000000         
+   91 00000000         ;;;;;;;;;;;;;;;;;;
+   92 00000000         ;; UC1 is in this block.
+   93 00000000         ;; Just turns on all the neccesary GPIO Clocks 
+   94 00000000         ;;;;;;;;;;;;;;;;;;
+   95 00000000 F7FF FFFE       BL               GPIO_ClockInit
+   96 00000004 F7FF FFFE       BL               GPIO_init
+   97 00000008 F7FF FFFE       BL               IDLE
    98 0000000C         
    99 0000000C         
-  100 0000000C         
-  101 0000000C         ;;;;;;;;;;;;;;;;;;;;;;
-  102 0000000C         ;; Turn on clocks
+  100 0000000C                 ENDP
+  101 0000000C         ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  102 0000000C         ;; Subroutines
   103 0000000C         ;;
-  104 0000000C         ;;
-  105 0000000C         ;;;;;;;;;;;;;;;;;;;;;;
-  106 0000000C         GPIO_ClockInit
-                               PROC
-  107 0000000C 4EAC            LDR              R6, =RCC_APB2ENR
-  108 0000000E 6830            LDR              R0, [R6]    ;
-  109 00000010 F040 003C       ORR              R0, #0x3C
-  110 00000014 6030            STR              R0, [R6]
-  111 00000016 F04F 0C01       LDR              R12, = 0x1  ;
-  112 0000001A         
-  113 0000001A         
+  104 0000000C         ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  105 0000000C         
+  106 0000000C         
+  107 0000000C         
+  108 0000000C         ;;;;;;;;;;;;;;;;;;;;;;
+  109 0000000C         ;; Turn on clocks
+  110 0000000C         ;;
+  111 0000000C         ;;
+  112 0000000C         ;;;;;;;;;;;;;;;;;;;;;;
 
 
 
 ARM Macro Assembler    Page 5 
 
 
-  114 0000001A 4770            BX               LR
-  115 0000001C                 ALIGN
-  116 0000001C                 ENDP
-  117 0000001C         GPIO_init
+  113 0000000C         GPIO_ClockInit
                                PROC
-  118 0000001C F04F 3244       LDR              R2,= 0x44444444
-  119 00000020 4FA8            LDR              R7,=GPIOA_CRH
-  120 00000022 6839            LDR              R1, [R7]    ;
-  121 00000024 603A            STR              R2, [R7]
-  122 00000026 4FA8            LDR              R7,= GPIOB_CRH ;
-  123 00000028 6839            LDR              R1, [R7]    ;
-  124 0000002A         
-  125 0000002A         
-  126 0000002A 4770            BX               LR
-  127 0000002C                 ALIGN
-  128 0000002C                 ENDP
-  129 0000002C         
-  130 0000002C         ;;;;;;;;;;;;;;;;;;;;;;;;;
-  131 0000002C         ;;; Idle State - UC1 and UC2;
-  132 0000002C         ;;; 
-  133 0000002C         ;;;
-  134 0000002C         ;;;
-  135 0000002C         ; ENEL 384 Pushbuttons: SW2(Red): PB8, SW3(Black): PB9, 
-                       SW4(Blue): PC12 *****NEW for 2015**** SW5(Green): PA5
-  136 0000002C         ; ENEL 384 board LEDs: D1 - PA9, D2 - PA10, D3 - PA11, D
-                       4 - PA12
+  114 0000000C 4EA6            LDR              R6, =RCC_APB2ENR
+  115 0000000E 6830            LDR              R0, [R6]    ;
+  116 00000010 F040 003C       ORR              R0, #0x3C
+  117 00000014 6030            STR              R0, [R6]
+  118 00000016 F04F 0C01       LDR              R12, = 0x1  ;
+  119 0000001A         
+  120 0000001A         
+  121 0000001A 4770            BX               LR
+  122 0000001C                 ALIGN
+  123 0000001C                 ENDP
+  124 0000001C         GPIO_init
+                               PROC
+  125 0000001C F04F 3244       LDR              R2,= 0x44444444
+  126 00000020 4FA2            LDR              R7,=GPIOA_CRH
+  127 00000022 6839            LDR              R1, [R7]    ;
+  128 00000024 603A            STR              R2, [R7]
+  129 00000026 4FA2            LDR              R7,= GPIOB_CRH ;
+  130 00000028 6839            LDR              R1, [R7]    ;
+  131 0000002A         
+  132 0000002A         
+  133 0000002A 4770            BX               LR
+  134 0000002C                 ALIGN
+  135 0000002C                 ENDP
+  136 0000002C         
   137 0000002C         ;;;;;;;;;;;;;;;;;;;;;;;;;
-  138 0000002C         
-  139 0000002C         
-  140 0000002C         
-  141 0000002C         
-  142 0000002C         
-  143 0000002C         
-  144 0000002C         
-  145 0000002C         ;;;;;;;;;;;;;;;;;;;;;;;;;;;
-  146 0000002C         ;; This IDLE State will constantly flash 
-  147 0000002C         ;; a pattern of lights from 
-  148 0000002C         ;; left to right in sequence 
-  149 0000002C         ;;until a button is pushed
-  150 0000002C         ;; UC2 - Waiting for Player Loop
-  151 0000002C         ;;;;;;;;;;;;;;;;;;;;;;;;;;;
-  152 0000002C         
-  153 0000002C         
-  154 0000002C         IDLE    PROC
-  155 0000002C F8DF 829C       LDR              R8,= 0x20001000 ;
-  156 00000030 48A7            LDR              R0,= REACT_TIME ;
-  157 00000032 F8C8 0000       STR              R0, [R8]    ;
-  158 00000036 B500            PUSH             {LR}
-  159 00000038 F04F 0000       LDR              R0,= 0x0    ;
-  160 0000003C F04F 0800       LDR              R8,= 0x0    ;
-  161 00000040         
-  162 00000040 F04F 0130       LDR              R1,= 0x30   ;
-  163 00000044         GameWaitPattern
-  164 00000044         
-  165 00000044 489F            LDR              R0,= GPIOA_CRH ;
-  166 00000046 6001            STR              R1, [R0]    ;
-  167 00000048 F8DF 8288       LDR              R8,= DELAYTIME
-  168 0000004C F7FF FFFE       BL               oneSecondDelay
-  169 00000050         
+  138 0000002C         ;;; Idle State - UC1 and UC2;
+  139 0000002C         ;;; 
+  140 0000002C         ;;;
+  141 0000002C         ;;;
+  142 0000002C         ; ENEL 384 Pushbuttons: SW2(Red): PB8, SW3(Black): PB9, 
+                       SW4(Blue): PC12 *****NEW for 2015**** SW5(Green): PA5
+  143 0000002C         ; ENEL 384 board LEDs: D1 - PA9, D2 - PA10, D3 - PA11, D
+                       4 - PA12
+  144 0000002C         ;;;;;;;;;;;;;;;;;;;;;;;;;
+  145 0000002C         
+  146 0000002C         ;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  147 0000002C         ;; This IDLE State will constantly flash 
+  148 0000002C         ;; a pattern of lights from 
+  149 0000002C         ;; left to right in sequence 
+  150 0000002C         ;; until a button is pushed
+  151 0000002C         ;; 
+  152 0000002C         ;; UC2 ---- UC2 ---- UC2
+  153 0000002C         ;; Waiting for Player Loop
+  154 0000002C         ;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  155 0000002C         
+  156 0000002C         
+  157 0000002C         IDLE    PROC
+  158 0000002C         ;;;;;;;;;;;;;;;;;;;;;
+  159 0000002C         ;;; This little tidbit actually stores the value of the 
+                       REACT_TIME into a memory location.
+  160 0000002C         ;;; Where we can modify and reuse it continously.
+  161 0000002C         ;;; This is modified when a user has pressed the correct
+                        button, the timer will be loaded, decremented and store
+                       d back for future use.
+  162 0000002C         ;;;;;;;;;;;;;;;;;;;;;
+  163 0000002C F8DF 8284       LDR              R8,= 0x20001000 ;
+  164 00000030 48A1            LDR              R0,= REACT_TIME ;
 
 
 
 ARM Macro Assembler    Page 6 
 
 
-  170 00000050         
-  171 00000050         
-  172 00000050 F7FF FFFE       BL               CheckforUser
-  173 00000054 F5B1 3F40       CMP              R1, #0x30000 ; ;; Since we turn
+  165 00000032 F8C8 0000       STR              R0, [R8]    ;
+  166 00000036 B500            PUSH             {LR}
+  167 00000038 F04F 0000       LDR              R0,= 0x0    ;
+  168 0000003C F04F 0800       LDR              R8,= 0x0    ;
+  169 00000040         
+  170 00000040 F04F 0130       LDR              R1,= 0x30   ;
+  171 00000044         GameWaitPattern
+  172 00000044         
+  173 00000044 4899            LDR              R0,= GPIOA_CRH ;
+  174 00000046 6001            STR              R1, [R0]    ;
+  175 00000048 F8DF 8270       LDR              R8,= DELAYTIME
+  176 0000004C F7FF FFFE       BL               R8SecondsDelay
+  177 00000050         
+  178 00000050         
+  179 00000050         
+  180 00000050 F7FF FFFE       BL               CheckforUser
+  181 00000054 F5B1 3F40       CMP              R1, #0x30000 ; ;; Since we turn
                                                              on the light in se
                                                             quence, we must res
                                                             et back to the firs
                                                             t light at the end.
                                                             
-  174 00000058 BF08 2103       MOVEQ            R1, #0x3    ;  ;; This does exa
+  182 00000058 BF08 2103       MOVEQ            R1, #0x3    ;  ;; This does exa
                                                             ctly that by taking
                                                              in the location of
                                                              which light we're 
                                                             at. then resets it.
                                                             
-  175 0000005C EA4F 1101       LSL              R1, R1, #0x4 ;;
-  176 00000060         
-  177 00000060 F85D EB04       POP              {LR}        ;
-  178 00000064 E7EE            B                GameWaitPattern
-  179 00000066 00 00           ALIGN
-  180 00000068                 ENDP
-  181 00000068         CheckforUser
+  183 0000005C EA4F 1101       LSL              R1, R1, #0x4 ;;
+  184 00000060         
+  185 00000060 F85D EB04       POP              {LR}        ;
+  186 00000064 E7EE            B                GameWaitPattern
+  187 00000066 00 00           ALIGN
+  188 00000068                 ENDP
+  189 00000068         CheckforUser
                                PROC
-  182 00000068 4A9B            LDR              R2,= GPIOB_IDR ; Loading in the
+  190 00000068 4A95            LDR              R2,= GPIOB_IDR ; Loading in the
                                                              input for the Push
                                                             Buttons assigned at
                                                              Port B;
-  183 0000006A 6812            LDR              R2, [R2]    ; 
-  184 0000006C EA4F 2212       LSR              R2, R2, #8  ; ;; We isolate the
+  191 0000006A 6812            LDR              R2, [R2]    ; 
+  192 0000006C EA4F 2212       LSR              R2, R2, #8  ; ;; We isolate the
                                                              bits corresponding
                                                              to a button press 
                                                             from either Red or 
                                                             Black.
-  185 00000070 2ADF            CMP              R2, #0xDF   ;
-  186 00000072 DBFE            BLT              GameStart
-  187 00000074 F04F 0200       LDR              R2,= 0x0    ;
-  188 00000078 4A98            LDR              R2,= GPIOC_IDR ; ;; Check Blue 
+  193 00000070 2ADF            CMP              R2, #0xDF   ;
+  194 00000072 DBFE            BLT              GameStart
+  195 00000074 F04F 0200       LDR              R2,= 0x0    ;
+  196 00000078 4A92            LDR              R2,= GPIOC_IDR ; ;; Check Blue 
                                                             Button at PC12
-  189 0000007A 6812            LDR              R2, [R2]    ;
-  190 0000007C EA4F 3212       LSR              R2, R2, #12 ;
-  191 00000080 2A0E            CMP              R2, #0xE    ;
-  192 00000082 D0FE            BEQ              GameStart
-  193 00000084 F04F 0200       LDR              R2,= 0x0    ;
-  194 00000088 4A95            LDR              R2,= GPIOA_IDR ;; Check Green B
+  197 0000007A 6812            LDR              R2, [R2]    ;
+  198 0000007C EA4F 3212       LSR              R2, R2, #12 ;
+  199 00000080 2A0E            CMP              R2, #0xE    ;
+  200 00000082 D0FE            BEQ              GameStart
+  201 00000084 F04F 0200       LDR              R2,= 0x0    ;
+  202 00000088 4A8F            LDR              R2,= GPIOA_IDR ;; Check Green B
                                                             utton at PA5
-  195 0000008A 6812            LDR              R2, [R2]    ;
-  196 0000008C EA4F 1252       LSR              R2, R2, #5  ;
-  197 00000090 F002 0201       AND              R2, R2, #0x1 ;
-  198 00000094 B382            CBZ              R2, GameStart ;
-  199 00000096         
-  200 00000096         
-  201 00000096 4770            BX               LR          ;
-  202 00000098                 ALIGN                        ;
-  203 00000098                 ENDP                         ;
-  204 00000098         
-  205 00000098         
-  206 00000098         oneSecondDelay
-                               PROC
-  207 00000098 F1A8 0801       SUB              R8,R8,#0x1  ;
+  203 0000008A 6812            LDR              R2, [R2]    ;
 
 
 
 ARM Macro Assembler    Page 7 
 
 
-  208 0000009C F1B8 0F00       CMP              R8, #0      ;
-  209 000000A0 DD00            BLE              endDelay
-  210 000000A2 DCFE            BGT              oneSecondDelay
-  211 000000A4                 ALIGN
-  212 000000A4                 ENDP
-  213 000000A4         endDelay
-  214 000000A4 4770            BX               LR          ;
-  215 000000A6         
-  216 000000A6         
-  217 000000A6         
-  218 000000A6         
-  219 000000A6         GameWait
+  204 0000008C EA4F 1252       LSR              R2, R2, #5  ;
+  205 00000090 F002 0201       AND              R2, R2, #0x1 ;
+  206 00000094 B352            CBZ              R2, GameStart ;
+  207 00000096         
+  208 00000096         
+  209 00000096 4770            BX               LR          ;
+  210 00000098                 ALIGN                        ;
+  211 00000098                 ENDP                         ;
+  212 00000098         
+  213 00000098         ;;;;;;;;;;;;;;;;;;;;;;;;;;
+  214 00000098         ;; Here is our generic timer or delay function
+  215 00000098         ;; It takes in the value passed into R8 and returns when
+                        
+  216 00000098         ;; The variable is 0.
+  217 00000098         ;;;;;;;;;;;;;;;;;;;;;;;;;;
+  218 00000098         
+  219 00000098         
+  220 00000098         R8SecondsDelay
                                PROC
-  220 000000A6 F1A6 0601       SUB              R6, R6, #0x1 ;
-  221 000000AA B106            CBZ              R6, TimerDone
-  222 000000AC E7FE            B                GameWait
-  223 000000AE         TimerDone
-  224 000000AE 4770            BX               LR          ;
-  225 000000B0                 ENDP
-  226 000000B0         
-  227 000000B0         CheckButtons
+  221 00000098 F1A8 0801       SUB              R8,R8,#0x1  ;
+  222 0000009C F1B8 0F00       CMP              R8, #0      ;
+  223 000000A0 DD00            BLE              endDelay
+  224 000000A2 DCFE            BGT              R8SecondsDelay
+  225 000000A4                 ALIGN
+  226 000000A4                 ENDP
+  227 000000A4         endDelay
+  228 000000A4 4770            BX               LR          ;
+  229 000000A6         
+  230 000000A6         ;;;;;;;;;;;;;;;;;;;;;;;;;;
+  231 000000A6         ;; This is a generic CheckButtons Function
+  232 000000A6         ;; It checks for any input in all four buttons
+  233 000000A6         ;; i.e ENEL 384 Pushbuttons: SW2(Red): PB8, SW3(Black): 
+                       PB9, SW4(Blue): PC12 SW5(Green): PA5
+  234 000000A6         ;; And then shifts, ORR's and operates so that it forms 
+                       a binary number.
+  235 000000A6         ;; For example, if the left most button is pressed (Red 
+                       - PB8)
+  236 000000A6         ;; Then the resulting binary number generated is 0001.
+  237 000000A6         ;; For the Blue - PC12, the Resulting binary number is 0
+                       100;
+  238 000000A6         ;; This is what's used to determine the pass/fail logic.
+                       
+  239 000000A6         ;;;;;;;;;;;;;;;;;;;;;;;;;;
+  240 000000A6         
+  241 000000A6         
+  242 000000A6         
+  243 000000A6         CheckButtons
                                PROC
-  228 000000B0 F04F 0500       LDR              R5,= 0x0    ;
-  229 000000B4 F8DF 8220       LDR              R8,= GPIOB_IDR
-  230 000000B8 F8D8 5000       LDR              R5, [R8]    ;
-  231 000000BC EA4F 2515       LSR              R5, R5, #8  ;
-  232 000000C0 F005 050F       AND              R5, R5, #0xF ;
-  233 000000C4 F085 050F       EOR              R5, R5, #0xF ;
-  234 000000C8 F8DF 8210       LDR              R8,= GPIOC_IDR
-  235 000000CC F8D8 4000       LDR              R4, [R8]    ;
-  236 000000D0 EA4F 3414       LSR              R4, R4, #12 ;
-  237 000000D4 2C0E            CMP              R4, #0xE    ;
-  238 000000D6 BF08 F045 
-              0504             ORREQ            R5, #0x4    ;
-  239 000000DC F8DF 8200       LDR              R8,= GPIOA_IDR ;
-  240 000000E0 F8D8 4000       LDR              R4, [R8]    ;
-  241 000000E4 EA4F 1454       LSR              R4, R4, #5  ;
-  242 000000E8 F004 0401       AND              R4, R4, #1  ;
-  243 000000EC 2C00            CMP              R4, #0x0    ; 
-  244 000000EE BF08 F045 
-              0508             ORREQ            R5, R5, #0x8 ; 
-  245 000000F4 4770            BX               LR
-  246 000000F6 00 00           ALIGN
-  247 000000F8                 ENDP
-  248 000000F8         
-  249 000000F8         GameStart
-                               PROC
-  250 000000F8 B500            PUSH             {LR}        ;
-  251 000000FA F04F 0200       LDR              R2, = 0x0   ;
-  252 000000FE         
-  253 000000FE         continuePlay
-  254 000000FE 4979            LDR              R1,= 0x4444444 ;
-  255 00000100         
-  256 00000100 4F70            LDR              R7, =GPIOA_CRH ;
-  257 00000102 6039            STR              R1, [R7]    ;
-  258 00000104 F8DF 81E0       LDR              R8, = PDTIME2 ;
-  259 00000108 F7FF FFFE       BL               oneSecondDelay ;
-  260 0000010C         
-  261 0000010C F04F 0A00       LDR              R10, = 0x0  ;
+  244 000000A6 F04F 0500       LDR              R5,= 0x0    ;
+  245 000000AA F8DF 8214       LDR              R8,= GPIOB_IDR
+  246 000000AE F8D8 5000       LDR              R5, [R8]    ;
+  247 000000B2 EA4F 2515       LSR              R5, R5, #8  ;
+  248 000000B6 F005 050F       AND              R5, R5, #0xF ;
+  249 000000BA F085 050F       EOR              R5, R5, #0xF ;
+  250 000000BE F8DF 8204       LDR              R8,= GPIOC_IDR
+  251 000000C2 F8D8 4000       LDR              R4, [R8]    ;
+  252 000000C6 EA4F 3414       LSR              R4, R4, #12 ;
+  253 000000CA 2C0E            CMP              R4, #0xE    ;
+  254 000000CC BF08 F045 
 
 
 
 ARM Macro Assembler    Page 8 
 
 
-  262 00000110         
-  263 00000110         loopmain                             ;
-  264 00000110         
-  265 00000110         
-  266 00000110 F7FF FFFE       BL               Rand        ;
-  267 00000114         
-  268 00000114         
-  269 00000114 2C00            CMP              R4, #0x0    ;
-  270 00000116 D0FE            BEQ              LED1        ;
-  271 00000118 F1B4 4F00       CMP              R4, #0x80000000 ;
-  272 0000011C D0FE            BEQ              LED2        ;
-  273 0000011E F1B4 4F40       CMP              R4, #0xC0000000 ;
-  274 00000122 D0FE            BEQ              LED3        ;
-  275 00000124 F1B4 4F80       CMP              R4, #0x40000000 ;
-  276 00000128 D0FE            BEQ              LED4        ; 
-  277 0000012A         
-  278 0000012A F04F 0A00       LDR              R10, = 0x0  ;
-  279 0000012E D1EF            BNE              loopmain
-  280 00000130         
-  281 00000130         
-  282 00000130         FinishedWinAnim
-  283 00000130 F85D EB04       POP              {LR}
-  284 00000134 E7FE            B                IDLE        ;
-  285 00000136 00 00           ALIGN
-  286 00000138                 ENDP
-  287 00000138         
-  288 00000138         Rand    PROC
-  289 00000138         ;; Rand Generator
-  290 00000138         
-  291 00000138 496C            LDR              R1,= 5000077 ;
-  292 0000013A F8DF A1B0       LDR              R10, = 5000077 ;
-  293 0000013E FB0C FC01       MUL              R12,R1      ;
-  294 00000142 44D4            ADD              R12, R10    ;
-  295 00000144 F00C 4440       AND              R4, R12, #0xC0000000 ;
-  296 00000148         
-  297 00000148 4770            BX               LR
-  298 0000014A 00 00           ALIGN
-  299 0000014C                 ENDP
-  300 0000014C         
-  301 0000014C         WinState
+              0504             ORREQ            R5, #0x4    ;
+  255 000000D2 F8DF 81F4       LDR              R8,= GPIOA_IDR ;
+  256 000000D6 F8D8 4000       LDR              R4, [R8]    ;
+  257 000000DA EA4F 1454       LSR              R4, R4, #5  ;
+  258 000000DE F004 0401       AND              R4, R4, #1  ;
+  259 000000E2 2C00            CMP              R4, #0x0    ; 
+  260 000000E4 BF08 F045 
+              0508             ORREQ            R5, R5, #0x8 ; 
+  261 000000EA 4770            BX               LR
+  262 000000EC                 ALIGN
+  263 000000EC                 ENDP
+  264 000000EC         
+  265 000000EC         
+  266 000000EC         
+  267 000000EC         
+  268 000000EC         
+  269 000000EC         
+  270 000000EC         ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+                       ;;;
+  271 000000EC         ;; UC3 ---- UC3 ---- UC3
+  272 000000EC         ;; GameStart is the actual game function, this is initia
+                       ted once the user has moved on from IDLE or wait state.
+  273 000000EC         ;;
+  274 000000EC         ;; It contains a PreLimWaitFunction on line 280. Loaded 
+                       with the PDTIME2, a different timer value used for Preli
+                       mWait
+  275 000000EC         ;;
+  276 000000EC         ;; Since we have an easy to use abstract timer function,
+                        we just use that.
+  277 000000EC         ;;
+  278 000000EC         ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+                       ;;;
+  279 000000EC         GameStart
                                PROC
-  302 0000014C F04F 0316       LDR              R3,= 0x16   ;
-  303 00000150 4F5C            LDR              R7,= GPIOA_CRH ;
-  304 00000152         WinCycleLoop
-  305 00000152 F243 0130       LDR              R1,= 0x3030 ;
-  306 00000156 6039            STR              R1, [R7]    ;
-  307 00000158 F8DF 8178       LDR              R8,= DELAYTIME
-  308 0000015C F7FF FFFE       BL               oneSecondDelay ;
-  309 00000160 F1A3 0301       SUB              R3, R3, #1  ;
-  310 00000164 EA4F 1101       LSL              R1, R1, #4  ;
-  311 00000168 6039            STR              R1, [R7]    ;
-  312 0000016A F8DF 8168       LDR              R8,= DELAYTIME
-  313 0000016E F7FF FFFE       BL               oneSecondDelay ;
-  314 00000172 F1A3 0301       SUB              R3, R3, #1  ;
-  315 00000176 B103            CBZ              R3, resetBackToIDLE
-  316 00000178 E7EB            B                WinCycleLoop
-  317 0000017A         resetBackToIDLE
-  318 0000017A E7FE            B                IDLE
-  319 0000017C                 ENDP
+  280 000000EC B500            PUSH             {LR}        ; ;; We push the LR
+                                                             here so that we ca
+                                                            n make calls to oth
+                                                            er functions within
+                                                             this one.
+  281 000000EE F04F 0200       LDR              R2, = 0x0   ;
+  282 000000F2         
+  283 000000F2         continuePlay
+  284 000000F2 4976            LDR              R1,= 0x4444444 ;
+  285 000000F4         
+  286 000000F4 4F6D            LDR              R7, =GPIOA_CRH ; 
+  287 000000F6 6039            STR              R1, [R7]    ;
+  288 000000F8 F8DF 81D4       LDR              R8, = PDTIME2 ;
+  289 000000FC F7FF FFFE       BL               R8SecondsDelay ;
+  290 00000100         
+  291 00000100         ;;;;;;
+  292 00000100         ;; The above sequence is used to indicate to the user th
+                       at the game has started. 
+  293 00000100         ;; That is, turning off all lights for a brief stint
+  294 00000100         ;;;;;;
+  295 00000100         
+  296 00000100 F04F 0A00       LDR              R10, = 0x0  ;
+  297 00000104         ;; Here we dive into the main game loop.
+  298 00000104         loopmain                             ;
+  299 00000104         
 
 
 
 ARM Macro Assembler    Page 9 
 
 
-  320 0000017C                 ALIGN
-  321 0000017C         
-  322 0000017C         PreLimWait
+  300 00000104         ;; Our Random number generator is called here. Jump to L
+                       ine 314
+  301 00000104 F7FF FFFE       BL               Rand        ;
+  302 00000108         
+  303 00000108         ;; Since we know that the Random number is stored in R4,
+                        we simply compare it to the possible values that it can
+                        be.
+  304 00000108         ;; We turn on the corresponding LED based on the random 
+                       number.
+  305 00000108 2C00            CMP              R4, #0x0    ;
+  306 0000010A D0FE            BEQ              LED1        ;
+  307 0000010C F1B4 4F00       CMP              R4, #0x80000000 ;
+  308 00000110 D0FE            BEQ              LED2        ;
+  309 00000112 F1B4 4F40       CMP              R4, #0xC0000000 ;
+  310 00000116 D0FE            BEQ              LED3        ;
+  311 00000118 F1B4 4F80       CMP              R4, #0x40000000 ;
+  312 0000011C D0FE            BEQ              LED4        ; 
+  313 0000011E         
+  314 0000011E F04F 0A00       LDR              R10, = 0x0  ;
+  315 00000122 D1EF            BNE              loopmain
+  316 00000124         
+  317 00000124         
+  318 00000124         FinishedWinAnim
+  319 00000124 F85D EB04       POP              {LR}
+  320 00000128 E7FE            B                IDLE        ;
+  321 0000012A 00 00           ALIGN
+  322 0000012C                 ENDP
+  323 0000012C         
+  324 0000012C         Rand    PROC
+  325 0000012C         ;; Rand Generator
+  326 0000012C         ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  327 0000012C         ;; Our random number generator is a very simple concept.
+                       
+  328 0000012C         ;; Take two large prime numbers. Add some relatively sma
+                       ll number to one and multiply the same small number to t
+                       he other
+  329 0000012C         ;; Then And them with some number. This will produce bit
+                       s in the very left most row.
+  330 0000012C         ;; The combinations are generally some sequence of 0, 4,
+                        8 or C in the left most hex digit.
+  331 0000012C         ;; The sequence of these combinations are random since t
+                       he small number is dependant on the current game level. 
+                       
+  332 0000012C         ;; Further adding randomization to the process
+  333 0000012C         ;;
+  334 0000012C         ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  335 0000012C 4969            LDR              R1,= 5000077 ;
+  336 0000012E F8DF A1A4       LDR              R10, = 5000077 ;
+  337 00000132 FB0C FC01       MUL              R12,R1      ;
+  338 00000136 44D4            ADD              R12, R10    ;
+  339 00000138 F00C 4440       AND              R4, R12, #0xC0000000 ;
+  340 0000013C         
+  341 0000013C 4770            BX               LR
+  342 0000013E 00 00           ALIGN
+  343 00000140                 ENDP
+  344 00000140         
+  345 00000140         
+  346 00000140         
+  347 00000140         
+
+
+
+ARM Macro Assembler    Page 10 
+
+
+  348 00000140         
+  349 00000140         
+  350 00000140         
+  351 00000140         ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  352 00000140         ;;;   UC4 ---- UC4 ---- UC4
+  353 00000140         ;;; Here is out Win State, i.e when the user has sucessf
+                       ully got the correct button pressed 16 times in sequence
+                       .
+  354 00000140         ;;; It displays a short animation of the lights back and
+                        forth a couple of times.
+  355 00000140         ;;; Then exits to IDLE state, awaiting the next user.
+  356 00000140         ;;;
+  357 00000140         ;;; It displays this animation of lights for a certain p
+                       eriod of time, around 10s.
+  358 00000140         ;;;
+  359 00000140         ;;;
+  360 00000140         ;;;
+  361 00000140         ;;; The user's proficiency is displayed just by reaching
+                        to this state. Since there are only 16 total levels, 
+  362 00000140         ;;; upon passing the 16th leads to this function
+  363 00000140         ;;; 
+  364 00000140         ;;;
+  365 00000140         ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  366 00000140         
+  367 00000140         WinState
                                PROC
-  323 0000017C 4E5A            LDR              R6, = PDTIME2 ;
-  324 0000017E F10A 0A01       ADD              R10, R10, #0x1 ;
-  325 00000182 45B2            CMP              R10, R6     ;
-  326 00000184 D1FE            BNE              PreLimWait
-  327 00000186 4770            BX               LR          ;
-  328 00000188                 ALIGN
-  329 00000188                 ENDP
-  330 00000188         
-  331 00000188         
-  332 00000188         LED1    PROC
-  333 00000188 F04F 0330       LDR              R3, = 0x30  ;
-  334 0000018C 603B            STR              R3, [R7]    ;
-  335 0000018E F04F 0300       LDR              R3, = 0x0   ;
-  336 00000192 4E4E            LDR              R6, = 0x20001000 ;
-  337 00000194 6836            LDR              R6, [R6]    ;
-  338 00000196         TimerLoop1
-  339 00000196 B500            PUSH             {LR}
-  340 00000198 F7FF FFFE       BL               CheckButtons
-  341 0000019C F85D EB04       POP              {LR}
-  342 000001A0 2D01            CMP              R5, #0x1    ;
-  343 000001A2 D0FE            BEQ              TurnOff1    ;
-  344 000001A4 DCFE            BGT              FailState
-  345 000001A6 F1A6 0602       SUB              R6, R6, #2  ;
-  346 000001AA B3DE            CBZ              R6, FailState
-  347 000001AC E7F3            B                TimerLoop1
-  348 000001AE 00 00           ALIGN
-  349 000001B0                 ENDP
-  350 000001B0         
-  351 000001B0         
-  352 000001B0         
-  353 000001B0         LED2    PROC
-  354 000001B0 F44F 7340       LDR              R3, = 0x300 ;
-  355 000001B4 603B            STR              R3, [R7]    ;
-  356 000001B6 4E45            LDR              R6, = 0x20001000 ;
-  357 000001B8 6836            LDR              R6, [R6]    ;
-  358 000001BA         TimerLoop2
-  359 000001BA B500            PUSH             {LR}
-  360 000001BC F7FF FFFE       BL               CheckButtons
-  361 000001C0 F85D EB04       POP              {LR}
-  362 000001C4 2D02            CMP              R5, #0x2    ;                  
+  368 00000140 F04F 0332       LDR              R3,= 0x32   ;
+  369 00000144 4F59            LDR              R7,= GPIOA_CRH ;
+  370 00000146         WinCycleLoop
+  371 00000146 F243 0130       LDR              R1,= 0x3030 ;
+  372 0000014A 6039            STR              R1, [R7]    ;
+  373 0000014C F8DF 816C       LDR              R8,= DELAYTIME
+  374 00000150 F7FF FFFE       BL               R8SecondsDelay ;
+  375 00000154 F1A3 0301       SUB              R3, R3, #1  ;
+  376 00000158 EA4F 1101       LSL              R1, R1, #4  ;
+  377 0000015C 6039            STR              R1, [R7]    ;
+  378 0000015E F8DF 815C       LDR              R8,= DELAYTIME
+  379 00000162 F7FF FFFE       BL               R8SecondsDelay ;
+  380 00000166 F1A3 0301       SUB              R3, R3, #1  ;
+  381 0000016A B103            CBZ              R3, resetBackToIDLE
+  382 0000016C E7EB            B                WinCycleLoop
+  383 0000016E         resetBackToIDLE
+  384 0000016E E7FE            B                IDLE
+  385 00000170                 ENDP
+  386 00000170                 ALIGN
+  387 00000170         
+  388 00000170         
+  389 00000170         
+  390 00000170         
+  391 00000170         ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  392 00000170         ;; LEDX contains the code to turn on an LED, where X is 
+                       (#1-#4).
+  393 00000170         ;;
+  394 00000170         ;; Then it also loads a value from the memory address of
+                        the timer.
+  395 00000170         ;; Which is decremented each cycle of the TimerLoopX whe
+                       re X is the LED number
+  396 00000170         ;; 
+  397 00000170         ;; We call CheckButtons each time on this cycle to ensur
+
+
+
+ARM Macro Assembler    Page 11 
+
+
+                       e that we always record if a button has been pressed.
+  398 00000170         ;;
+  399 00000170         ;; If the incorrect button has been pressed we will know
+                        instantly since the binary number outputed from CheckBu
+                       ttons 
+  400 00000170         ;; will be different than the one we expect
+  401 00000170         ;;
+  402 00000170         ;; As such there are two ways to reach FailState from he
+                       re, that is:
+  403 00000170         ;; 1. Exit to Fail state when the incorrect button has b
+                       een pressed.
+  404 00000170         ;; 2. Exit to fail state when the timer has been expired
+                       
+  405 00000170         ;; These are both two different events.
+  406 00000170         ;;
+  407 00000170         ;;
+  408 00000170         ;; Lastly, if the correct button has been pressed we wil
+                       l proceed to the TurnOffState
+  409 00000170         ;; Where the corresponding light turns off. And the leve
+                       l is incremented by one.
+  410 00000170         ;;
+  411 00000170         ;;
+  412 00000170         ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  413 00000170         
+  414 00000170         
+  415 00000170         
+  416 00000170         
+  417 00000170         LED1    PROC
+  418 00000170 F04F 0330       LDR              R3, = 0x30  ;
+  419 00000174 603B            STR              R3, [R7]    ;
+  420 00000176 F04F 0300       LDR              R3, = 0x0   ;
+  421 0000017A 4E4E            LDR              R6, = 0x20001000 ;
+  422 0000017C 6836            LDR              R6, [R6]    ;
+  423 0000017E         TimerLoop1
+  424 0000017E B500            PUSH             {LR}
+  425 00000180 F7FF FFFE       BL               CheckButtons
+  426 00000184 F85D EB04       POP              {LR}
+  427 00000188 2D01            CMP              R5, #0x1    ;
+  428 0000018A D0FE            BEQ              TurnOff1    ;
+  429 0000018C DCFE            BGT              FailState
+  430 0000018E F1A6 0602       SUB              R6, R6, #2  ;
+  431 00000192 B3DE            CBZ              R6, FailState
+  432 00000194 E7F3            B                TimerLoop1
+  433 00000196 00 00           ALIGN
+  434 00000198                 ENDP
+  435 00000198         
+  436 00000198         
+  437 00000198         
+  438 00000198         LED2    PROC
+  439 00000198 F44F 7340       LDR              R3, = 0x300 ;
+  440 0000019C 603B            STR              R3, [R7]    ;
+  441 0000019E 4E45            LDR              R6, = 0x20001000 ;
+  442 000001A0 6836            LDR              R6, [R6]    ;
+  443 000001A2         TimerLoop2
+  444 000001A2 B500            PUSH             {LR}
+  445 000001A4 F7FF FFFE       BL               CheckButtons
+  446 000001A8 F85D EB04       POP              {LR}
+  447 000001AC 2D02            CMP              R5, #0x2    ;                  
                                                                                
+
+
+
+ARM Macro Assembler    Page 12 
+
+
                                                                                
                                                                                
                                                                                
@@ -577,162 +727,230 @@ ARM Macro Assembler    Page 9
                                                                                
                                                                                
                                                                              
-  363 000001C6 D0FE            BEQ              TurnOff1    ;
-  364 000001C8 2D01            CMP              R5, #0x1    ;
-  365 000001CA DAFE            BGE              FailState
-  366 000001CC F1A6 0602       SUB              R6, R6, #2  ;
-  367 000001D0 B346            CBZ              R6, FailState
-  368 000001D2 E7F2            B                TimerLoop2
+  448 000001AE D0FE            BEQ              TurnOff1    ;
+  449 000001B0 2D01            CMP              R5, #0x1    ;
+  450 000001B2 DAFE            BGE              FailState
+  451 000001B4 F1A6 0602       SUB              R6, R6, #2  ;
+  452 000001B8 B346            CBZ              R6, FailState
+  453 000001BA E7F2            B                TimerLoop2
+  454 000001BC                 ALIGN
+  455 000001BC                 ENDP
+  456 000001BC         
+  457 000001BC         ;;;;
+  458 000001BC         ;; Assembly code doesn't like being spaced apart, this a
+                       cts as a springboard to let us get back to our original 
+                       state.
+  459 000001BC         ;; (used in the Turn Off Function)
+  460 000001BC         ;;;;
+  461 000001BC         JumpWin PROC
+  462 000001BC E7FE            B                WinState
+  463 000001BE 00 00           ALIGN
+  464 000001C0                 ENDP
+  465 000001C0         
+  466 000001C0         
+  467 000001C0         LED3    PROC
+  468 000001C0 F44F 5340       LDR              R3, = 0x3000 ;
+  469 000001C4 603B            STR              R3, [R7]    ;
+  470 000001C6 4E3B            LDR              R6, = 0x20001000 ;
+  471 000001C8 6836            LDR              R6, [R6]    ;
+  472 000001CA         TimerLoop3
+  473 000001CA B500            PUSH             {LR}
+  474 000001CC F7FF FFFE       BL               CheckButtons
+  475 000001D0 F85D EB04       POP              {LR}
+  476 000001D4 2D04            CMP              R5, #0x4    ;      
+  477 000001D6 D0FE            BEQ              TurnOff1    ;
+  478 000001D8 2D01            CMP              R5, #0x1    ;
+  479 000001DA DAFE            BGE              FailState
+  480 000001DC F1A6 0602       SUB              R6, R6, #2  ;
+  481 000001E0 B1A6            CBZ              R6, FailState
+  482 000001E2 E7F2            B                TimerLoop3
+  483 000001E4                 ALIGN
+  484 000001E4                 ENDP
+  485 000001E4         
+  486 000001E4         
+  487 000001E4                 ALIGN
+  488 000001E4         LED4    PROC
+  489 000001E4 F44F 3340       LDR              R3, = 0x30000 ;
+  490 000001E8 603B            STR              R3, [R7]    ;
+  491 000001EA 4E32            LDR              R6, = 0x20001000 ;
+  492 000001EC 6836            LDR              R6, [R6]    ;
+  493 000001EE         TimerLoop4
+  494 000001EE B500            PUSH             {LR}
+  495 000001F0 F7FF FFFE       BL               CheckButtons
+  496 000001F4 F85D EB04       POP              {LR}
 
 
 
-ARM Macro Assembler    Page 10 
+ARM Macro Assembler    Page 13 
 
 
-  369 000001D4                 ALIGN
-  370 000001D4                 ENDP
-  371 000001D4         
-  372 000001D4         JumpWin PROC
-  373 000001D4 E7FE            B                WinState
-  374 000001D6 00 00           ALIGN
-  375 000001D8                 ENDP
-  376 000001D8         LED3    PROC
-  377 000001D8 F44F 5340       LDR              R3, = 0x3000 ;
-  378 000001DC 603B            STR              R3, [R7]    ;
-  379 000001DE 4E3B            LDR              R6, = 0x20001000 ;
-  380 000001E0 6836            LDR              R6, [R6]    ;
-  381 000001E2         TimerLoop3
-  382 000001E2 B500            PUSH             {LR}
-  383 000001E4 F7FF FFFE       BL               CheckButtons
-  384 000001E8 F85D EB04       POP              {LR}
-  385 000001EC 2D04            CMP              R5, #0x4    ;      
-  386 000001EE D0FE            BEQ              TurnOff1    ;
-  387 000001F0 2D01            CMP              R5, #0x1    ;
-  388 000001F2 DAFE            BGE              FailState
-  389 000001F4 F1A6 0602       SUB              R6, R6, #2  ;
-  390 000001F8 B1A6            CBZ              R6, FailState
-  391 000001FA E7F2            B                TimerLoop3
-  392 000001FC                 ALIGN
-  393 000001FC                 ENDP
-  394 000001FC         
-  395 000001FC         
-  396 000001FC                 ALIGN
-  397 000001FC         LED4    PROC
-  398 000001FC F44F 3340       LDR              R3, = 0x30000 ;
-  399 00000200 603B            STR              R3, [R7]    ;
-  400 00000202 4E32            LDR              R6, = 0x20001000 ;
-  401 00000204 6836            LDR              R6, [R6]    ;
-  402 00000206         TimerLoop4
-  403 00000206 B500            PUSH             {LR}
-  404 00000208 F7FF FFFE       BL               CheckButtons
-  405 0000020C F85D EB04       POP              {LR}
-  406 00000210 2D08            CMP              R5, #0x8    ;
-  407 00000212 D0FE            BEQ              TurnOff1    ;
-  408 00000214 2D01            CMP              R5, #0x1    ;
-  409 00000216 DAFE            BGE              FailState   ;
-  410 00000218 B333            CBZ              R3, TurnOff1 ;
-  411 0000021A F1A6 0602       SUB              R6, R6, #2  ;
-  412 0000021E B10E            CBZ              R6, FailState
-  413 00000220 E7F1            B                TimerLoop4
-  414 00000222 00 00           ALIGN
-  415 00000224                 ENDP
-  416 00000224         FailState
+  497 000001F8 2D08            CMP              R5, #0x8    ;
+  498 000001FA D0FE            BEQ              TurnOff1    ;
+  499 000001FC 2D01            CMP              R5, #0x1    ;
+  500 000001FE DAFE            BGE              FailState   ;
+  501 00000200 B333            CBZ              R3, TurnOff1 ;
+  502 00000202 F1A6 0602       SUB              R6, R6, #2  ;
+  503 00000206 B10E            CBZ              R6, FailState
+  504 00000208 E7F1            B                TimerLoop4
+  505 0000020A 00 00           ALIGN
+  506 0000020C                 ENDP
+  507 0000020C         
+  508 0000020C         ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  509 0000020C         ;;  UC5 ---- UC5 ---- UC5
+  510 0000020C         ;; Here is our fail state. Where the user has either exp
+                       ired the timer or pressed the wrong button in the curren
+                       t level.
+  511 0000020C         ;; It displays all lights briefly to let the user know t
+                       he game has ended.
+  512 0000020C         ;; Then it flashes the lights to show the binary number 
+                       of the highest level completed.
+  513 0000020C         ;; Lastly exiting to the IDLE loop (UC2) awaiting the ne
+                       xt user. 
+  514 0000020C         ;;
+  515 0000020C         ;;
+  516 0000020C         ;; All numbers from 1 - 15 are represented. 
+  517 0000020C         ;; So that if the user fails on the very last level, the
+                       n all lights will flash to indicate 15 in binary
+  518 0000020C         ;;  
+  519 0000020C         ;; If the user fails on the very first level (techincall
+                       y level 0), then no lights flash and it goes straight to
+                        the IDLE loop (UC2);
+  520 0000020C         ;;
+  521 0000020C         ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  522 0000020C         
+  523 0000020C         FailState
                                PROC
-  417 00000224 4F27            LDR              R7,= GPIOA_CRH ;
-  418 00000226 F04F 0005       LDR              R0,= 0x5    ;
-  419 0000022A 4931            LDR              R1,= 0x33330 ;
-  420 0000022C 6039            STR              R1, [R7]    ;
-  421 0000022E F8DF 80A4       LDR              R8,= DELAYTIME
-  422 00000232 F7FF FFFE       BL               oneSecondDelay ;
-  423 00000236 B18A            CBZ              R2, leave   ;
-  424 00000238 F7FF FFFE       BL               GetBitCount
-  425 0000023C         
-  426 0000023C         Failloop
+  524 0000020C 4F27            LDR              R7,= GPIOA_CRH ;
+  525 0000020E F04F 0005       LDR              R0,= 0x5    ;
+  526 00000212 4931            LDR              R1,= 0x33330 ;
+  527 00000214 6039            STR              R1, [R7]    ;
+  528 00000216 F8DF 80A4       LDR              R8,= DELAYTIME
+  529 0000021A F7FF FFFE       BL               R8SecondsDelay ;
+  530 0000021E B18A            CBZ              R2, leave   ;
+  531 00000220 F7FF FFFE       BL               GetBitCount
+  532 00000224         
+  533 00000224         Failloop
+  534 00000224 6039            STR              R1, [R7]    ;
+  535 00000226 F8DF 8090       LDR              R8,= FAIL_TIME
+  536 0000022A F7FF FFFE       BL               R8SecondsDelay ;
+  537 0000022E F04F 0200       LDR              R2,= 0x0    ;
+  538 00000232 603A            STR              R2, [R7]    ;
+  539 00000234 F8DF 8080       LDR              R8,= FAIL_TIME ;
+  540 00000238 F7FF FFFE       BL               R8SecondsDelay
+  541 0000023C F1A0 0001       SUB              R0, R0, #1  ;
+  542 00000240 B100            CBZ              R0, leave
+  543 00000242 E7EF            B                Failloop
+  544 00000244         leave
+  545 00000244 BC7E            POP              {R1,R2,R3,R4,R5,R6}
+  546 00000246 F8DF 8074       LDR              R8,= DELAYTIME ;
 
 
 
-ARM Macro Assembler    Page 11 
+ARM Macro Assembler    Page 14 
 
 
-  427 0000023C 6039            STR              R1, [R7]    ;
-  428 0000023E F8DF 80B4       LDR              R8,= FAIL_TIME
-  429 00000242 F7FF FFFE       BL               oneSecondDelay ;
-  430 00000246 F04F 0200       LDR              R2,= 0x0    ;
-  431 0000024A 603A            STR              R2, [R7]    ;
-  432 0000024C F8DF 80A4       LDR              R8,= FAIL_TIME ;
-  433 00000250 F7FF FFFE       BL               oneSecondDelay
-  434 00000254 F1A0 0001       SUB              R0, R0, #1  ;
-  435 00000258 B100            CBZ              R0, leave
-  436 0000025A E7EF            B                Failloop
-  437 0000025C         leave
-  438 0000025C BC7E            POP              {R1,R2,R3,R4,R5,R6}
-  439 0000025E F8DF 8074       LDR              R8,= DELAYTIME ;
-  440 00000262 F7FF FFFE       BL               oneSecondDelay
-  441 00000266 E7FE            B                IDLE
-  442 00000268                 ALIGN
-  443 00000268                 ENDP
-  444 00000268         TurnOff1
+  547 0000024A F7FF FFFE       BL               R8SecondsDelay
+  548 0000024E E7FE            B                IDLE
+  549 00000250                 ALIGN
+  550 00000250                 ENDP
+  551 00000250         
+  552 00000250         ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  553 00000250         ;; Here is the Turn Off State.
+  554 00000250         ;; We arrive here everytime the correct button correspon
+                       ding to the light has been pressed.
+  555 00000250         ;;
+  556 00000250         ;; There are several things happening here. 
+  557 00000250         ;; Most notably, we turn off the light.
+  558 00000250         ;; Then, we load in the old timer value for REACT_TIME
+  559 00000250         ;; And decrement it by the value of the level and a smal
+                       l number 0x400.
+  560 00000250         ;; This way, each subsequent level is "harder" since the
+                        user has less time to react to.
+  561 00000250         ;; 
+  562 00000250         ;; Because we always store the value of time in memory w
+                       e just plug it back into 0x20001000
+  563 00000250         ;;
+  564 00000250         ;; If and only if the value of R2 is 16. (We have achiev
+                       ed 16 button presses) then we "Win" the game and proceed
+                        to the WinState
+  565 00000250         ;;
+  566 00000250         ;; Otherwise, we just proceed to the game loop and conti
+                       nue to the next level.
+  567 00000250         ;;
+  568 00000250         ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  569 00000250         
+  570 00000250         TurnOff1
                                PROC
-  445 00000268 F04F 0100       LDR              R1, =  0x0  ;
-  446 0000026C 6039            STR              R1, [R7]    ;
-  447 0000026E F44F 6AA0       LDR              R10,= 0x500
-  448 00000272         
-  449 00000272 4E16            LDR              R6, = 0x20001000 ;
-  450 00000274 6831            LDR              R1, [R6]    ;
-  451 00000276 F102 0201       ADD              R2, R2, #1  ;
-  452 0000027A FB0A FA02       MUL              R10, R10, R2 ;
-  453 0000027E EBA1 010A       SUB              R1, R1, R10 ;
-  454 00000282 6031            STR              R1, [R6]    ;
-  455 00000284         
-  456 00000284 2A10            CMP              R2, #16     ;
-  457 00000286 D0FE            BEQ              JumpWin
-  458 00000288 E739            B                continuePlay ;
-  459 0000028A 00 00           ALIGN
-  460 0000028C                 ENDP
-  461 0000028C         GetBitCount
+  571 00000250 F04F 0100       LDR              R1, =  0x0  ;
+  572 00000254 6039            STR              R1, [R7]    ;
+  573 00000256 F44F 6A80       LDR              R10,= 0x400
+  574 0000025A         
+  575 0000025A 4E16            LDR              R6, = 0x20001000 ;
+  576 0000025C 6831            LDR              R1, [R6]    ;
+  577 0000025E F102 0201       ADD              R2, R2, #1  ;
+  578 00000262 FB0A FA02       MUL              R10, R10, R2 ;
+  579 00000266 46D4            MOV              R12, R10    ;
+  580 00000268 EBA1 010A       SUB              R1, R1, R10 ;
+  581 0000026C 6031            STR              R1, [R6]    ;
+  582 0000026E         
+  583 0000026E 2A10            CMP              R2, #16     ;
+  584 00000270 D0FE            BEQ              JumpWin
+  585 00000272 E73E            B                continuePlay ;
+  586 00000274                 ALIGN
+  587 00000274                 ENDP
+  588 00000274         GetBitCount
                                PROC
-  462 0000028C         ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-  463 0000028C         ;; Obtain the level number and represent 
-  464 0000028C         ;; it as a sequence of lights in binary
-  465 0000028C         ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-  466 0000028C         ;; We know level is stored in R2.
-  467 0000028C F04F 0400       LDR              R4,= 0x0    ;
-  468 00000290 F04F 0508       LDR              R5,= 0x8    ;
-  469 00000294 F04F 0830       LDR              R8,= 0x30   ;
-  470 00000298         GetDigits
-  471 00000298 B155            CBZ              R5, Done    ;
-  472 0000029A         
-  473 0000029A EA02 0105       AND              R1, R2, R5  ;
-  474 0000029E 42A9            CMP              R1, R5      ;
-  475 000002A0 BF08 EA44 
+  589 00000274         ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  590 00000274         ;; Obtain the level number and represent 
+  591 00000274         ;; it as a sequence of lights in binary
+  592 00000274         ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  593 00000274         ;; Here we modify the level number so that it correspond
+                       s to a binary number within our LED's.
+  594 00000274         ;; i.e Lets say we reach level 5, 5 in binary is 0101. A
+                       nd so we turn on the 2nd and 4th LEDS from the left.
+
+
+
+ARM Macro Assembler    Page 15 
+
+
+  595 00000274         ;; It's interesting to note that we have to keep in mind
+                        that although the LED's go left to right, each one is t
+                       urned on by an increasing value of 0x30.
+  596 00000274         ;; We've made our loop so that this happens efficently. 
+                       It returns the correct hex number to turn on the lights 
+                       in R1.
+  597 00000274 F04F 0400       LDR              R4,= 0x0    ;
+  598 00000278 F04F 0508       LDR              R5,= 0x8    ;
+  599 0000027C F04F 0830       LDR              R8,= 0x30   ;
+  600 00000280         GetDigits
+  601 00000280 B155            CBZ              R5, Done    ;
+  602 00000282         
+  603 00000282 EA02 0105       AND              R1, R2, R5  ;
+  604 00000286 42A9            CMP              R1, R5      ;
+  605 00000288 BF08 EA44 
               0408             ORREQ            R4, R8      ;
-  476 000002A6 EA4F 1808       LSL              R8, R8, #4  ;
-  477 000002AA EA4F 0555       LSR              R5, R5, #1  ;
-  478 000002AE E7F3            B                GetDigits
-  479 000002B0         Done
-  480 000002B0 F04F 0100       LDR              R1,= 0      ;
-  481 000002B4 4621            MOV              R1, R4      ;
-  482 000002B6 F04F 0400       LDR              R4,= 0      ;
-
-
-
-ARM Macro Assembler    Page 12 
-
-
-  483 000002BA F04F 0800       LDR              R8,= 0      ;
-  484 000002BE         
-  485 000002BE 4770            BX               LR
-  486 000002C0                 ALIGN
-  487 000002C0                 ENDP
-  488 000002C0         
-  489 000002C0         Finish
-  490 000002C0         
-  491 000002C0                 END
+  606 0000028E EA4F 1808       LSL              R8, R8, #4  ;
+  607 00000292 EA4F 0555       LSR              R5, R5, #1  ;
+  608 00000296 E7F3            B                GetDigits
+  609 00000298         Done
+  610 00000298 F04F 0100       LDR              R1,= 0      ;
+  611 0000029C 4621            MOV              R1, R4      ;
+  612 0000029E F04F 0400       LDR              R4,= 0      ;
+  613 000002A2 F04F 0800       LDR              R8,= 0      ;
+  614 000002A6         
+  615 000002A6 4770            BX               LR
+  616 000002A8                 ALIGN
+  617 000002A8                 ENDP
+  618 000002A8         
+  619 000002A8         Finish
+  620 000002A8         
+  621 000002A8                 END
               40021018 
               40010804 
               40010C04 
               20001000 
-              00086470 
+              00055730 
               00030D40 
               40010C08 
               40011008 
@@ -741,7 +959,6 @@ ARM Macro Assembler    Page 12
               0007A120 
               004C4B8D 
               00033330 
-              00055730 
 Command Line: --debug --xref --diag_suppress=9931 --cpu=Cortex-M3 --apcs=interw
 ork --depend=.\objects\fp1.d -o.\objects\fp1.o -IC:\Users\shrey\Documents\Cours
 es\ENSE352\Whac-A-Mole\RTE -IC:\Keil_v5\ARM\PACK\Keil\STM32F1xx_DFP\2.1.0\Devic
@@ -758,7 +975,7 @@ RESET 00000000
 
 Symbol: RESET
    Definitions
-      At line 75 in file FP1.s
+      At line 79 in file FP1.s
    Uses
       None
 Comment: RESET unused
@@ -766,9 +983,9 @@ __Vectors 00000000
 
 Symbol: __Vectors
    Definitions
-      At line 78 in file FP1.s
+      At line 82 in file FP1.s
    Uses
-      At line 76 in file FP1.s
+      At line 80 in file FP1.s
 Comment: __Vectors used once
 2 symbols
 
@@ -777,65 +994,65 @@ Comment: __Vectors used once
 ARM Macro Assembler    Page 1 Alphabetic symbol ordering
 Relocatable symbols
 
-CheckButtons 000000B0
+CheckButtons 000000A6
 
 Symbol: CheckButtons
    Definitions
-      At line 227 in file FP1.s
+      At line 243 in file FP1.s
    Uses
-      At line 340 in file FP1.s
-      At line 360 in file FP1.s
-      At line 383 in file FP1.s
-      At line 404 in file FP1.s
+      At line 425 in file FP1.s
+      At line 445 in file FP1.s
+      At line 474 in file FP1.s
+      At line 495 in file FP1.s
 
 CheckforUser 00000068
 
 Symbol: CheckforUser
    Definitions
-      At line 181 in file FP1.s
+      At line 189 in file FP1.s
    Uses
-      At line 172 in file FP1.s
+      At line 180 in file FP1.s
 Comment: CheckforUser used once
-Done 000002B0
+Done 00000298
 
 Symbol: Done
    Definitions
-      At line 479 in file FP1.s
+      At line 609 in file FP1.s
    Uses
-      At line 471 in file FP1.s
+      At line 601 in file FP1.s
 Comment: Done used once
-FailState 00000224
+FailState 0000020C
 
 Symbol: FailState
    Definitions
-      At line 416 in file FP1.s
+      At line 523 in file FP1.s
    Uses
-      At line 344 in file FP1.s
-      At line 346 in file FP1.s
-      At line 365 in file FP1.s
-      At line 367 in file FP1.s
-      At line 388 in file FP1.s
-      At line 390 in file FP1.s
-      At line 409 in file FP1.s
-      At line 412 in file FP1.s
+      At line 429 in file FP1.s
+      At line 431 in file FP1.s
+      At line 450 in file FP1.s
+      At line 452 in file FP1.s
+      At line 479 in file FP1.s
+      At line 481 in file FP1.s
+      At line 500 in file FP1.s
+      At line 503 in file FP1.s
 
-Failloop 0000023C
+Failloop 00000224
 
 Symbol: Failloop
    Definitions
-      At line 426 in file FP1.s
+      At line 533 in file FP1.s
    Uses
-      At line 436 in file FP1.s
+      At line 543 in file FP1.s
 Comment: Failloop used once
-Finish 000002C0
+Finish 000002A8
 
 Symbol: Finish
    Definitions
-      At line 489 in file FP1.s
+      At line 619 in file FP1.s
    Uses
       None
 Comment: Finish unused
-FinishedWinAnim 00000130
+FinishedWinAnim 00000124
 
 
 
@@ -845,7 +1062,7 @@ Relocatable symbols
 
 Symbol: FinishedWinAnim
    Definitions
-      At line 282 in file FP1.s
+      At line 318 in file FP1.s
    Uses
       None
 Comment: FinishedWinAnim unused
@@ -853,53 +1070,53 @@ GPIO_ClockInit 0000000C
 
 Symbol: GPIO_ClockInit
    Definitions
-      At line 106 in file FP1.s
+      At line 113 in file FP1.s
    Uses
-      At line 88 in file FP1.s
+      At line 95 in file FP1.s
 Comment: GPIO_ClockInit used once
 GPIO_init 0000001C
 
 Symbol: GPIO_init
    Definitions
-      At line 117 in file FP1.s
+      At line 124 in file FP1.s
    Uses
-      At line 89 in file FP1.s
+      At line 96 in file FP1.s
 Comment: GPIO_init used once
-GameStart 000000F8
+GameStart 000000EC
 
 Symbol: GameStart
    Definitions
-      At line 249 in file FP1.s
+      At line 279 in file FP1.s
    Uses
-      At line 186 in file FP1.s
-      At line 192 in file FP1.s
-      At line 198 in file FP1.s
+      At line 194 in file FP1.s
+      At line 200 in file FP1.s
+      At line 206 in file FP1.s
 
-GameWait 000000A6
-
-Symbol: GameWait
-   Definitions
-      At line 219 in file FP1.s
-   Uses
-      At line 222 in file FP1.s
-Comment: GameWait used once
 GameWaitPattern 00000044
 
 Symbol: GameWaitPattern
    Definitions
-      At line 163 in file FP1.s
+      At line 171 in file FP1.s
    Uses
-      At line 178 in file FP1.s
+      At line 186 in file FP1.s
 Comment: GameWaitPattern used once
-GetBitCount 0000028C
+GetBitCount 00000274
 
 Symbol: GetBitCount
    Definitions
-      At line 461 in file FP1.s
+      At line 588 in file FP1.s
    Uses
-      At line 424 in file FP1.s
+      At line 531 in file FP1.s
 Comment: GetBitCount used once
-GetDigits 00000298
+GetDigits 00000280
+
+Symbol: GetDigits
+   Definitions
+      At line 600 in file FP1.s
+   Uses
+      At line 608 in file FP1.s
+Comment: GetDigits used once
+IDLE 0000002C
 
 
 
@@ -907,64 +1124,64 @@ GetDigits 00000298
 ARM Macro Assembler    Page 3 Alphabetic symbol ordering
 Relocatable symbols
 
-Symbol: GetDigits
-   Definitions
-      At line 470 in file FP1.s
-   Uses
-      At line 478 in file FP1.s
-Comment: GetDigits used once
-IDLE 0000002C
-
 Symbol: IDLE
    Definitions
-      At line 154 in file FP1.s
+      At line 157 in file FP1.s
    Uses
-      At line 90 in file FP1.s
-      At line 284 in file FP1.s
-      At line 318 in file FP1.s
-      At line 441 in file FP1.s
+      At line 97 in file FP1.s
+      At line 320 in file FP1.s
+      At line 384 in file FP1.s
+      At line 548 in file FP1.s
 
-JumpWin 000001D4
+JumpWin 000001BC
 
 Symbol: JumpWin
    Definitions
-      At line 372 in file FP1.s
+      At line 461 in file FP1.s
    Uses
-      At line 457 in file FP1.s
+      At line 584 in file FP1.s
 Comment: JumpWin used once
-LED1 00000188
+LED1 00000170
 
 Symbol: LED1
    Definitions
-      At line 332 in file FP1.s
+      At line 417 in file FP1.s
    Uses
-      At line 270 in file FP1.s
+      At line 306 in file FP1.s
 Comment: LED1 used once
-LED2 000001B0
+LED2 00000198
 
 Symbol: LED2
    Definitions
-      At line 353 in file FP1.s
+      At line 438 in file FP1.s
    Uses
-      At line 272 in file FP1.s
+      At line 308 in file FP1.s
 Comment: LED2 used once
-LED3 000001D8
+LED3 000001C0
 
 Symbol: LED3
    Definitions
-      At line 376 in file FP1.s
+      At line 467 in file FP1.s
    Uses
-      At line 274 in file FP1.s
+      At line 310 in file FP1.s
 Comment: LED3 used once
-LED4 000001FC
+LED4 000001E4
 
 Symbol: LED4
    Definitions
-      At line 397 in file FP1.s
+      At line 488 in file FP1.s
    Uses
-      At line 276 in file FP1.s
+      At line 312 in file FP1.s
 Comment: LED4 used once
 MYCODE 00000000
+
+Symbol: MYCODE
+   Definitions
+      At line 85 in file FP1.s
+   Uses
+      None
+Comment: MYCODE unused
+R8SecondsDelay 00000098
 
 
 
@@ -972,64 +1189,64 @@ MYCODE 00000000
 ARM Macro Assembler    Page 4 Alphabetic symbol ordering
 Relocatable symbols
 
-Symbol: MYCODE
+Symbol: R8SecondsDelay
    Definitions
-      At line 81 in file FP1.s
+      At line 220 in file FP1.s
    Uses
-      None
-Comment: MYCODE unused
-PreLimWait 0000017C
+      At line 176 in file FP1.s
+      At line 224 in file FP1.s
+      At line 289 in file FP1.s
+      At line 374 in file FP1.s
+      At line 379 in file FP1.s
+      At line 529 in file FP1.s
+      At line 536 in file FP1.s
+      At line 540 in file FP1.s
+      At line 547 in file FP1.s
 
-Symbol: PreLimWait
-   Definitions
-      At line 322 in file FP1.s
-   Uses
-      At line 326 in file FP1.s
-Comment: PreLimWait used once
-Rand 00000138
+Rand 0000012C
 
 Symbol: Rand
    Definitions
-      At line 288 in file FP1.s
+      At line 324 in file FP1.s
    Uses
-      At line 266 in file FP1.s
+      At line 301 in file FP1.s
 Comment: Rand used once
 Reset_Handler 00000000
 
 Symbol: Reset_Handler
    Definitions
-      At line 85 in file FP1.s
+      At line 89 in file FP1.s
    Uses
-      At line 79 in file FP1.s
-      At line 82 in file FP1.s
+      At line 83 in file FP1.s
+      At line 86 in file FP1.s
 
-TimerDone 000000AE
-
-Symbol: TimerDone
-   Definitions
-      At line 223 in file FP1.s
-   Uses
-      At line 221 in file FP1.s
-Comment: TimerDone used once
-TimerLoop1 00000196
+TimerLoop1 0000017E
 
 Symbol: TimerLoop1
    Definitions
-      At line 338 in file FP1.s
+      At line 423 in file FP1.s
    Uses
-      At line 347 in file FP1.s
+      At line 432 in file FP1.s
 Comment: TimerLoop1 used once
-TimerLoop2 000001BA
+TimerLoop2 000001A2
 
 Symbol: TimerLoop2
    Definitions
-      At line 358 in file FP1.s
+      At line 443 in file FP1.s
    Uses
-      At line 368 in file FP1.s
+      At line 453 in file FP1.s
 Comment: TimerLoop2 used once
-TimerLoop3 000001E2
+TimerLoop3 000001CA
 
 Symbol: TimerLoop3
+   Definitions
+      At line 472 in file FP1.s
+   Uses
+      At line 482 in file FP1.s
+Comment: TimerLoop3 used once
+TimerLoop4 000001EE
+
+Symbol: TimerLoop4
    Definitions
 
 
@@ -1037,110 +1254,86 @@ Symbol: TimerLoop3
 ARM Macro Assembler    Page 5 Alphabetic symbol ordering
 Relocatable symbols
 
-      At line 381 in file FP1.s
+      At line 493 in file FP1.s
    Uses
-      At line 391 in file FP1.s
-Comment: TimerLoop3 used once
-TimerLoop4 00000206
-
-Symbol: TimerLoop4
-   Definitions
-      At line 402 in file FP1.s
-   Uses
-      At line 413 in file FP1.s
+      At line 504 in file FP1.s
 Comment: TimerLoop4 used once
-TurnOff1 00000268
+TurnOff1 00000250
 
 Symbol: TurnOff1
    Definitions
-      At line 444 in file FP1.s
+      At line 570 in file FP1.s
    Uses
-      At line 343 in file FP1.s
-      At line 363 in file FP1.s
-      At line 386 in file FP1.s
-      At line 407 in file FP1.s
-      At line 410 in file FP1.s
+      At line 428 in file FP1.s
+      At line 448 in file FP1.s
+      At line 477 in file FP1.s
+      At line 498 in file FP1.s
+      At line 501 in file FP1.s
 
-WinCycleLoop 00000152
+WinCycleLoop 00000146
 
 Symbol: WinCycleLoop
    Definitions
-      At line 304 in file FP1.s
+      At line 370 in file FP1.s
    Uses
-      At line 316 in file FP1.s
+      At line 382 in file FP1.s
 Comment: WinCycleLoop used once
-WinState 0000014C
+WinState 00000140
 
 Symbol: WinState
    Definitions
-      At line 301 in file FP1.s
+      At line 367 in file FP1.s
    Uses
-      At line 373 in file FP1.s
+      At line 462 in file FP1.s
 Comment: WinState used once
-continuePlay 000000FE
+continuePlay 000000F2
 
 Symbol: continuePlay
    Definitions
-      At line 253 in file FP1.s
+      At line 283 in file FP1.s
    Uses
-      At line 458 in file FP1.s
+      At line 585 in file FP1.s
 Comment: continuePlay used once
 endDelay 000000A4
 
 Symbol: endDelay
    Definitions
-      At line 213 in file FP1.s
+      At line 227 in file FP1.s
    Uses
-      At line 209 in file FP1.s
+      At line 223 in file FP1.s
 Comment: endDelay used once
-leave 0000025C
+leave 00000244
 
 Symbol: leave
+   Definitions
+      At line 544 in file FP1.s
+   Uses
+      At line 530 in file FP1.s
+      At line 542 in file FP1.s
+
+loopmain 00000104
+
 
 
 
 ARM Macro Assembler    Page 6 Alphabetic symbol ordering
 Relocatable symbols
 
-   Definitions
-      At line 437 in file FP1.s
-   Uses
-      At line 423 in file FP1.s
-      At line 435 in file FP1.s
-
-loopmain 00000110
-
 Symbol: loopmain
    Definitions
-      At line 263 in file FP1.s
+      At line 298 in file FP1.s
    Uses
-      At line 279 in file FP1.s
+      At line 315 in file FP1.s
 Comment: loopmain used once
-oneSecondDelay 00000098
-
-Symbol: oneSecondDelay
-   Definitions
-      At line 206 in file FP1.s
-   Uses
-      At line 168 in file FP1.s
-      At line 210 in file FP1.s
-      At line 259 in file FP1.s
-      At line 308 in file FP1.s
-      At line 313 in file FP1.s
-      At line 422 in file FP1.s
-      At line 429 in file FP1.s
-      At line 433 in file FP1.s
-      At line 440 in file FP1.s
-
-resetBackToIDLE 0000017A
+resetBackToIDLE 0000016E
 
 Symbol: resetBackToIDLE
    Definitions
-      At line 317 in file FP1.s
+      At line 383 in file FP1.s
    Uses
-      At line 315 in file FP1.s
+      At line 381 in file FP1.s
 Comment: resetBackToIDLE used once
-38 symbols
+35 symbols
 
 
 
@@ -1151,28 +1344,28 @@ DELAYTIME 00030D40
 
 Symbol: DELAYTIME
    Definitions
-      At line 69 in file FP1.s
+      At line 73 in file FP1.s
    Uses
-      At line 167 in file FP1.s
-      At line 307 in file FP1.s
-      At line 312 in file FP1.s
-      At line 421 in file FP1.s
-      At line 439 in file FP1.s
+      At line 175 in file FP1.s
+      At line 373 in file FP1.s
+      At line 378 in file FP1.s
+      At line 528 in file FP1.s
+      At line 546 in file FP1.s
 
 FAIL_TIME 00055730
 
 Symbol: FAIL_TIME
    Definitions
-      At line 73 in file FP1.s
+      At line 77 in file FP1.s
    Uses
-      At line 428 in file FP1.s
-      At line 432 in file FP1.s
+      At line 535 in file FP1.s
+      At line 539 in file FP1.s
 
 GPIOA_BRR 40010814
 
 Symbol: GPIOA_BRR
    Definitions
-      At line 29 in file FP1.s
+      At line 33 in file FP1.s
    Uses
       None
 Comment: GPIOA_BRR unused
@@ -1180,7 +1373,7 @@ GPIOA_BSRR 40010810
 
 Symbol: GPIOA_BSRR
    Definitions
-      At line 28 in file FP1.s
+      At line 32 in file FP1.s
    Uses
       None
 Comment: GPIOA_BSRR unused
@@ -1188,19 +1381,19 @@ GPIOA_CRH 40010804
 
 Symbol: GPIOA_CRH
    Definitions
-      At line 25 in file FP1.s
+      At line 29 in file FP1.s
    Uses
-      At line 119 in file FP1.s
-      At line 165 in file FP1.s
-      At line 256 in file FP1.s
-      At line 303 in file FP1.s
-      At line 417 in file FP1.s
+      At line 126 in file FP1.s
+      At line 173 in file FP1.s
+      At line 286 in file FP1.s
+      At line 369 in file FP1.s
+      At line 524 in file FP1.s
 
 GPIOA_CRL 40010800
 
 Symbol: GPIOA_CRL
    Definitions
-      At line 24 in file FP1.s
+      At line 28 in file FP1.s
    Uses
       None
 Comment: GPIOA_CRL unused
@@ -1214,16 +1407,16 @@ Absolute symbols
 
 Symbol: GPIOA_IDR
    Definitions
-      At line 26 in file FP1.s
+      At line 30 in file FP1.s
    Uses
-      At line 194 in file FP1.s
-      At line 239 in file FP1.s
+      At line 202 in file FP1.s
+      At line 255 in file FP1.s
 
 GPIOA_LCKR 40010818
 
 Symbol: GPIOA_LCKR
    Definitions
-      At line 30 in file FP1.s
+      At line 34 in file FP1.s
    Uses
       None
 Comment: GPIOA_LCKR unused
@@ -1231,7 +1424,7 @@ GPIOA_ODR 4001080C
 
 Symbol: GPIOA_ODR
    Definitions
-      At line 27 in file FP1.s
+      At line 31 in file FP1.s
    Uses
       None
 Comment: GPIOA_ODR unused
@@ -1239,7 +1432,7 @@ GPIOB_BRR 40010C14
 
 Symbol: GPIOB_BRR
    Definitions
-      At line 38 in file FP1.s
+      At line 42 in file FP1.s
    Uses
       None
 Comment: GPIOB_BRR unused
@@ -1247,7 +1440,7 @@ GPIOB_BSRR 40010C10
 
 Symbol: GPIOB_BSRR
    Definitions
-      At line 37 in file FP1.s
+      At line 41 in file FP1.s
    Uses
       None
 Comment: GPIOB_BSRR unused
@@ -1255,15 +1448,15 @@ GPIOB_CRH 40010C04
 
 Symbol: GPIOB_CRH
    Definitions
-      At line 34 in file FP1.s
+      At line 38 in file FP1.s
    Uses
-      At line 122 in file FP1.s
+      At line 129 in file FP1.s
 Comment: GPIOB_CRH used once
 GPIOB_CRL 40010C00
 
 Symbol: GPIOB_CRL
    Definitions
-      At line 33 in file FP1.s
+      At line 37 in file FP1.s
    Uses
       None
 Comment: GPIOB_CRL unused
@@ -1277,16 +1470,16 @@ Symbol: GPIOB_IDR
 ARM Macro Assembler    Page 3 Alphabetic symbol ordering
 Absolute symbols
 
-      At line 35 in file FP1.s
+      At line 39 in file FP1.s
    Uses
-      At line 182 in file FP1.s
-      At line 229 in file FP1.s
+      At line 190 in file FP1.s
+      At line 245 in file FP1.s
 
 GPIOB_LCKR 40010C18
 
 Symbol: GPIOB_LCKR
    Definitions
-      At line 39 in file FP1.s
+      At line 43 in file FP1.s
    Uses
       None
 Comment: GPIOB_LCKR unused
@@ -1294,7 +1487,7 @@ GPIOB_ODR 40010C0C
 
 Symbol: GPIOB_ODR
    Definitions
-      At line 36 in file FP1.s
+      At line 40 in file FP1.s
    Uses
       None
 Comment: GPIOB_ODR unused
@@ -1302,7 +1495,7 @@ GPIOC_BRR 40011014
 
 Symbol: GPIOC_BRR
    Definitions
-      At line 48 in file FP1.s
+      At line 52 in file FP1.s
    Uses
       None
 Comment: GPIOC_BRR unused
@@ -1310,7 +1503,7 @@ GPIOC_BSRR 40011010
 
 Symbol: GPIOC_BSRR
    Definitions
-      At line 47 in file FP1.s
+      At line 51 in file FP1.s
    Uses
       None
 Comment: GPIOC_BSRR unused
@@ -1318,7 +1511,7 @@ GPIOC_CRH 40011004
 
 Symbol: GPIOC_CRH
    Definitions
-      At line 44 in file FP1.s
+      At line 48 in file FP1.s
    Uses
       None
 Comment: GPIOC_CRH unused
@@ -1326,7 +1519,7 @@ GPIOC_CRL 40011000
 
 Symbol: GPIOC_CRL
    Definitions
-      At line 43 in file FP1.s
+      At line 47 in file FP1.s
    Uses
       None
 Comment: GPIOC_CRL unused
@@ -1334,7 +1527,7 @@ GPIOC_IDR 40011008
 
 Symbol: GPIOC_IDR
    Definitions
-      At line 45 in file FP1.s
+      At line 49 in file FP1.s
    Uses
 
 
@@ -1342,14 +1535,14 @@ Symbol: GPIOC_IDR
 ARM Macro Assembler    Page 4 Alphabetic symbol ordering
 Absolute symbols
 
-      At line 188 in file FP1.s
-      At line 234 in file FP1.s
+      At line 196 in file FP1.s
+      At line 250 in file FP1.s
 
 GPIOC_LCKR 40011018
 
 Symbol: GPIOC_LCKR
    Definitions
-      At line 49 in file FP1.s
+      At line 53 in file FP1.s
    Uses
       None
 Comment: GPIOC_LCKR unused
@@ -1357,7 +1550,7 @@ GPIOC_ODR 4001100C
 
 Symbol: GPIOC_ODR
    Definitions
-      At line 46 in file FP1.s
+      At line 50 in file FP1.s
    Uses
       None
 Comment: GPIOC_ODR unused
@@ -1365,15 +1558,15 @@ INITIAL_MSP 20001000
 
 Symbol: INITIAL_MSP
    Definitions
-      At line 20 in file FP1.s
+      At line 24 in file FP1.s
    Uses
-      At line 78 in file FP1.s
+      At line 82 in file FP1.s
 Comment: INITIAL_MSP used once
 PDTIME 000927C0
 
 Symbol: PDTIME
    Definitions
-      At line 70 in file FP1.s
+      At line 74 in file FP1.s
    Uses
       None
 Comment: PDTIME unused
@@ -1381,16 +1574,15 @@ PDTIME2 0007A120
 
 Symbol: PDTIME2
    Definitions
-      At line 71 in file FP1.s
+      At line 75 in file FP1.s
    Uses
-      At line 258 in file FP1.s
-      At line 323 in file FP1.s
-
+      At line 288 in file FP1.s
+Comment: PDTIME2 used once
 RCC_AHBENR 40021014
 
 Symbol: RCC_AHBENR
    Definitions
-      At line 58 in file FP1.s
+      At line 62 in file FP1.s
    Uses
       None
 Comment: RCC_AHBENR unused
@@ -1398,21 +1590,21 @@ RCC_APB1ENR 4002101C
 
 Symbol: RCC_APB1ENR
    Definitions
-      At line 62 in file FP1.s
+      At line 66 in file FP1.s
    Uses
       None
+Comment: RCC_APB1ENR unused
 
 
 
 ARM Macro Assembler    Page 5 Alphabetic symbol ordering
 Absolute symbols
 
-Comment: RCC_APB1ENR unused
 RCC_APB1RSTR 40021010
 
 Symbol: RCC_APB1RSTR
    Definitions
-      At line 57 in file FP1.s
+      At line 61 in file FP1.s
    Uses
       None
 Comment: RCC_APB1RSTR unused
@@ -1420,15 +1612,15 @@ RCC_APB2ENR 40021018
 
 Symbol: RCC_APB2ENR
    Definitions
-      At line 60 in file FP1.s
+      At line 64 in file FP1.s
    Uses
-      At line 107 in file FP1.s
+      At line 114 in file FP1.s
 Comment: RCC_APB2ENR used once
 RCC_APB2RSTR 4002100C
 
 Symbol: RCC_APB2RSTR
    Definitions
-      At line 56 in file FP1.s
+      At line 60 in file FP1.s
    Uses
       None
 Comment: RCC_APB2RSTR unused
@@ -1436,7 +1628,7 @@ RCC_BDCR 40021020
 
 Symbol: RCC_BDCR
    Definitions
-      At line 63 in file FP1.s
+      At line 67 in file FP1.s
    Uses
       None
 Comment: RCC_BDCR unused
@@ -1444,7 +1636,7 @@ RCC_CFGR 40021004
 
 Symbol: RCC_CFGR
    Definitions
-      At line 54 in file FP1.s
+      At line 58 in file FP1.s
    Uses
       None
 Comment: RCC_CFGR unused
@@ -1452,7 +1644,7 @@ RCC_CFGR2 4002102C
 
 Symbol: RCC_CFGR2
    Definitions
-      At line 65 in file FP1.s
+      At line 69 in file FP1.s
    Uses
       None
 Comment: RCC_CFGR2 unused
@@ -1460,21 +1652,21 @@ RCC_CIR 40021008
 
 Symbol: RCC_CIR
    Definitions
-      At line 55 in file FP1.s
+      At line 59 in file FP1.s
    Uses
       None
 Comment: RCC_CIR unused
 RCC_CR 40021000
 
+Symbol: RCC_CR
 
 
 
 ARM Macro Assembler    Page 6 Alphabetic symbol ordering
 Absolute symbols
 
-Symbol: RCC_CR
    Definitions
-      At line 53 in file FP1.s
+      At line 57 in file FP1.s
    Uses
       None
 Comment: RCC_CR unused
@@ -1482,17 +1674,17 @@ RCC_CSR 40021024
 
 Symbol: RCC_CSR
    Definitions
-      At line 64 in file FP1.s
+      At line 68 in file FP1.s
    Uses
       None
 Comment: RCC_CSR unused
-REACT_TIME 00086470
+REACT_TIME 00055730
 
 Symbol: REACT_TIME
    Definitions
-      At line 72 in file FP1.s
+      At line 76 in file FP1.s
    Uses
-      At line 156 in file FP1.s
+      At line 164 in file FP1.s
 Comment: REACT_TIME used once
 38 symbols
-413 symbols in table
+410 symbols in table

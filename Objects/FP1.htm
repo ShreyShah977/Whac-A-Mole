@@ -3,7 +3,7 @@
 <title>Static Call Graph - [.\Objects\FP1.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image .\Objects\FP1.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060300: Last Updated: Wed Dec 02 18:23:31 2020
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060300: Last Updated: Thu Dec 03 09:53:38 2020
 <BR><P>
 <H3>Maximum Stack Usage =          0 bytes + Unknown(Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
@@ -11,12 +11,10 @@ Call chain for Maximum Stack Depth:</H3>
 <P>
 <H3>
 Mutually Recursive functions
-</H3> <LI><a href="#[6]">oneSecondDelay</a>&nbsp;&nbsp;&nbsp;&rArr;&nbsp;&nbsp;&nbsp;<a href="#[6]">oneSecondDelay</a><BR>
- <LI><a href="#[b]">WinState</a>&nbsp;&nbsp;&nbsp;&rArr;&nbsp;&nbsp;&nbsp;<a href="#[4]">IDLE</a><BR>
- <LI><a href="#[12]">FailState</a>&nbsp;&nbsp;&nbsp;&rArr;&nbsp;&nbsp;&nbsp;<a href="#[4]">IDLE</a><BR>
- <LI><a href="#[9]">GameStart</a>&nbsp;&nbsp;&nbsp;&rArr;&nbsp;&nbsp;&nbsp;<a href="#[4]">IDLE</a><BR>
- <LI><a href="#[7]">GameWait</a>&nbsp;&nbsp;&nbsp;&rArr;&nbsp;&nbsp;&nbsp;<a href="#[7]">GameWait</a><BR>
- <LI><a href="#[c]">PreLimWait</a>&nbsp;&nbsp;&nbsp;&rArr;&nbsp;&nbsp;&nbsp;<a href="#[c]">PreLimWait</a><BR>
+</H3> <LI><a href="#[6]">R8SecondsDelay</a>&nbsp;&nbsp;&nbsp;&rArr;&nbsp;&nbsp;&nbsp;<a href="#[6]">R8SecondsDelay</a><BR>
+ <LI><a href="#[a]">WinState</a>&nbsp;&nbsp;&nbsp;&rArr;&nbsp;&nbsp;&nbsp;<a href="#[4]">IDLE</a><BR>
+ <LI><a href="#[10]">FailState</a>&nbsp;&nbsp;&nbsp;&rArr;&nbsp;&nbsp;&nbsp;<a href="#[4]">IDLE</a><BR>
+ <LI><a href="#[8]">GameStart</a>&nbsp;&nbsp;&nbsp;&rArr;&nbsp;&nbsp;&nbsp;<a href="#[4]">IDLE</a><BR>
 </UL>
 <P>
 <H3>
@@ -46,133 +44,121 @@ Local Symbols
 </UL>
 
 <P><STRONG><a name="[4]"></a>IDLE</STRONG> (Thumb, 60 bytes, Stack size 0 bytes, fp1.o(MYCODE))
-<BR><BR>[Calls]<UL><LI><a href="#[6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;oneSecondDelay
+<BR><BR>[Calls]<UL><LI><a href="#[6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;R8SecondsDelay
 <LI><a href="#[5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;CheckforUser
 </UL>
 <BR>[Called By]<UL><LI><a href="#[1]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Reset_Handler
-<LI><a href="#[12]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;FailState
-<LI><a href="#[b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;WinState
-<LI><a href="#[9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;GameStart
+<LI><a href="#[10]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;FailState
+<LI><a href="#[a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;WinState
+<LI><a href="#[8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;GameStart
 </UL>
 
 <P><STRONG><a name="[5]"></a>CheckforUser</STRONG> (Thumb, 48 bytes, Stack size 0 bytes, fp1.o(MYCODE))
-<BR><BR>[Calls]<UL><LI><a href="#[9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;GameStart
+<BR><BR>[Calls]<UL><LI><a href="#[8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;GameStart
 </UL>
 <BR>[Called By]<UL><LI><a href="#[4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;IDLE
 </UL>
 
-<P><STRONG><a name="[6]"></a>oneSecondDelay</STRONG> (Thumb, 12 bytes, Stack size 0 bytes, fp1.o(MYCODE))
-<BR><BR>[Calls]<UL><LI><a href="#[6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;oneSecondDelay
+<P><STRONG><a name="[6]"></a>R8SecondsDelay</STRONG> (Thumb, 12 bytes, Stack size 0 bytes, fp1.o(MYCODE))
+<BR><BR>[Calls]<UL><LI><a href="#[6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;R8SecondsDelay
 </UL>
-<BR>[Called By]<UL><LI><a href="#[12]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;FailState
-<LI><a href="#[b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;WinState
-<LI><a href="#[9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;GameStart
-<LI><a href="#[6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;oneSecondDelay
+<BR>[Called By]<UL><LI><a href="#[10]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;FailState
+<LI><a href="#[a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;WinState
+<LI><a href="#[8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;GameStart
+<LI><a href="#[6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;R8SecondsDelay
 <LI><a href="#[4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;IDLE
 </UL>
 
-<P><STRONG><a name="[7]"></a>GameWait</STRONG> (Thumb, 10 bytes, Stack size 0 bytes, fp1.o(MYCODE), UNUSED, KEPT)
-<BR><BR>[Calls]<UL><LI><a href="#[7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;GameWait
-</UL>
-<BR>[Called By]<UL><LI><a href="#[7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;GameWait
-</UL>
-
-<P><STRONG><a name="[8]"></a>CheckButtons</STRONG> (Thumb, 72 bytes, Stack size 0 bytes, fp1.o(MYCODE))
-<BR><BR>[Called By]<UL><LI><a href="#[11]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;LED4
-<LI><a href="#[10]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;LED3
-<LI><a href="#[e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;LED2
-<LI><a href="#[d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;LED1
+<P><STRONG><a name="[7]"></a>CheckButtons</STRONG> (Thumb, 70 bytes, Stack size 0 bytes, fp1.o(MYCODE))
+<BR><BR>[Called By]<UL><LI><a href="#[f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;LED4
+<LI><a href="#[e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;LED3
+<LI><a href="#[c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;LED2
+<LI><a href="#[b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;LED1
 </UL>
 
-<P><STRONG><a name="[9]"></a>GameStart</STRONG> (Thumb, 64 bytes, Stack size 0 bytes, fp1.o(MYCODE))
-<BR><BR>[Calls]<UL><LI><a href="#[11]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;LED4
-<LI><a href="#[10]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;LED3
-<LI><a href="#[e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;LED2
-<LI><a href="#[d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;LED1
-<LI><a href="#[a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Rand
-<LI><a href="#[6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;oneSecondDelay
+<P><STRONG><a name="[8]"></a>GameStart</STRONG> (Thumb, 64 bytes, Stack size 0 bytes, fp1.o(MYCODE))
+<BR><BR>[Calls]<UL><LI><a href="#[f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;LED4
+<LI><a href="#[e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;LED3
+<LI><a href="#[c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;LED2
+<LI><a href="#[b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;LED1
+<LI><a href="#[9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Rand
+<LI><a href="#[6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;R8SecondsDelay
 <LI><a href="#[4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;IDLE
 </UL>
 <BR>[Called By]<UL><LI><a href="#[5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;CheckforUser
 </UL>
 
-<P><STRONG><a name="[a]"></a>Rand</STRONG> (Thumb, 20 bytes, Stack size 0 bytes, fp1.o(MYCODE))
-<BR><BR>[Called By]<UL><LI><a href="#[9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;GameStart
+<P><STRONG><a name="[9]"></a>Rand</STRONG> (Thumb, 20 bytes, Stack size 0 bytes, fp1.o(MYCODE))
+<BR><BR>[Called By]<UL><LI><a href="#[8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;GameStart
 </UL>
 
-<P><STRONG><a name="[b]"></a>WinState</STRONG> (Thumb, 48 bytes, Stack size 0 bytes, fp1.o(MYCODE))
-<BR><BR>[Calls]<UL><LI><a href="#[6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;oneSecondDelay
+<P><STRONG><a name="[a]"></a>WinState</STRONG> (Thumb, 48 bytes, Stack size 0 bytes, fp1.o(MYCODE))
+<BR><BR>[Calls]<UL><LI><a href="#[6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;R8SecondsDelay
 <LI><a href="#[4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;IDLE
 </UL>
-<BR>[Called By]<UL><LI><a href="#[f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;JumpWin
+<BR>[Called By]<UL><LI><a href="#[d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;JumpWin
 </UL>
 
-<P><STRONG><a name="[c]"></a>PreLimWait</STRONG> (Thumb, 12 bytes, Stack size 0 bytes, fp1.o(MYCODE), UNUSED, KEPT)
-<BR><BR>[Calls]<UL><LI><a href="#[c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;PreLimWait
+<P><STRONG><a name="[b]"></a>LED1</STRONG> (Thumb, 40 bytes, Stack size 0 bytes, fp1.o(MYCODE))
+<BR><BR>[Calls]<UL><LI><a href="#[11]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;TurnOff1
+<LI><a href="#[10]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;FailState
+<LI><a href="#[7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;CheckButtons
 </UL>
-<BR>[Called By]<UL><LI><a href="#[c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;PreLimWait
-</UL>
-
-<P><STRONG><a name="[d]"></a>LED1</STRONG> (Thumb, 40 bytes, Stack size 0 bytes, fp1.o(MYCODE))
-<BR><BR>[Calls]<UL><LI><a href="#[13]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;TurnOff1
-<LI><a href="#[12]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;FailState
-<LI><a href="#[8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;CheckButtons
-</UL>
-<BR>[Called By]<UL><LI><a href="#[9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;GameStart
+<BR>[Called By]<UL><LI><a href="#[8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;GameStart
 </UL>
 
-<P><STRONG><a name="[e]"></a>LED2</STRONG> (Thumb, 36 bytes, Stack size 0 bytes, fp1.o(MYCODE))
-<BR><BR>[Calls]<UL><LI><a href="#[13]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;TurnOff1
-<LI><a href="#[12]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;FailState
-<LI><a href="#[8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;CheckButtons
+<P><STRONG><a name="[c]"></a>LED2</STRONG> (Thumb, 36 bytes, Stack size 0 bytes, fp1.o(MYCODE))
+<BR><BR>[Calls]<UL><LI><a href="#[11]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;TurnOff1
+<LI><a href="#[10]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;FailState
+<LI><a href="#[7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;CheckButtons
 </UL>
-<BR>[Called By]<UL><LI><a href="#[9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;GameStart
-</UL>
-
-<P><STRONG><a name="[f]"></a>JumpWin</STRONG> (Thumb, 4 bytes, Stack size 0 bytes, fp1.o(MYCODE))
-<BR><BR>[Calls]<UL><LI><a href="#[b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;WinState
-</UL>
-<BR>[Called By]<UL><LI><a href="#[13]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;TurnOff1
+<BR>[Called By]<UL><LI><a href="#[8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;GameStart
 </UL>
 
-<P><STRONG><a name="[10]"></a>LED3</STRONG> (Thumb, 36 bytes, Stack size 0 bytes, fp1.o(MYCODE))
-<BR><BR>[Calls]<UL><LI><a href="#[13]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;TurnOff1
-<LI><a href="#[12]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;FailState
-<LI><a href="#[8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;CheckButtons
+<P><STRONG><a name="[d]"></a>JumpWin</STRONG> (Thumb, 4 bytes, Stack size 0 bytes, fp1.o(MYCODE))
+<BR><BR>[Calls]<UL><LI><a href="#[a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;WinState
 </UL>
-<BR>[Called By]<UL><LI><a href="#[9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;GameStart
+<BR>[Called By]<UL><LI><a href="#[11]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;TurnOff1
 </UL>
 
-<P><STRONG><a name="[11]"></a>LED4</STRONG> (Thumb, 40 bytes, Stack size 0 bytes, fp1.o(MYCODE))
-<BR><BR>[Calls]<UL><LI><a href="#[13]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;TurnOff1
-<LI><a href="#[12]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;FailState
-<LI><a href="#[8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;CheckButtons
+<P><STRONG><a name="[e]"></a>LED3</STRONG> (Thumb, 36 bytes, Stack size 0 bytes, fp1.o(MYCODE))
+<BR><BR>[Calls]<UL><LI><a href="#[11]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;TurnOff1
+<LI><a href="#[10]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;FailState
+<LI><a href="#[7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;CheckButtons
 </UL>
-<BR>[Called By]<UL><LI><a href="#[9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;GameStart
+<BR>[Called By]<UL><LI><a href="#[8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;GameStart
 </UL>
 
-<P><STRONG><a name="[12]"></a>FailState</STRONG> (Thumb, 68 bytes, Stack size 0 bytes, fp1.o(MYCODE))
-<BR><BR>[Calls]<UL><LI><a href="#[14]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;GetBitCount
-<LI><a href="#[6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;oneSecondDelay
+<P><STRONG><a name="[f]"></a>LED4</STRONG> (Thumb, 40 bytes, Stack size 0 bytes, fp1.o(MYCODE))
+<BR><BR>[Calls]<UL><LI><a href="#[11]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;TurnOff1
+<LI><a href="#[10]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;FailState
+<LI><a href="#[7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;CheckButtons
+</UL>
+<BR>[Called By]<UL><LI><a href="#[8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;GameStart
+</UL>
+
+<P><STRONG><a name="[10]"></a>FailState</STRONG> (Thumb, 68 bytes, Stack size 0 bytes, fp1.o(MYCODE))
+<BR><BR>[Calls]<UL><LI><a href="#[12]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;GetBitCount
+<LI><a href="#[6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;R8SecondsDelay
 <LI><a href="#[4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;IDLE
 </UL>
-<BR>[Called By]<UL><LI><a href="#[11]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;LED4
-<LI><a href="#[10]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;LED3
-<LI><a href="#[e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;LED2
-<LI><a href="#[d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;LED1
+<BR>[Called By]<UL><LI><a href="#[f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;LED4
+<LI><a href="#[e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;LED3
+<LI><a href="#[c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;LED2
+<LI><a href="#[b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;LED1
 </UL>
 
-<P><STRONG><a name="[13]"></a>TurnOff1</STRONG> (Thumb, 36 bytes, Stack size 0 bytes, fp1.o(MYCODE))
-<BR><BR>[Calls]<UL><LI><a href="#[f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;JumpWin
+<P><STRONG><a name="[11]"></a>TurnOff1</STRONG> (Thumb, 36 bytes, Stack size 0 bytes, fp1.o(MYCODE))
+<BR><BR>[Calls]<UL><LI><a href="#[d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;JumpWin
 </UL>
-<BR>[Called By]<UL><LI><a href="#[11]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;LED4
-<LI><a href="#[10]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;LED3
-<LI><a href="#[e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;LED2
-<LI><a href="#[d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;LED1
+<BR>[Called By]<UL><LI><a href="#[f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;LED4
+<LI><a href="#[e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;LED3
+<LI><a href="#[c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;LED2
+<LI><a href="#[b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;LED1
 </UL>
 
-<P><STRONG><a name="[14]"></a>GetBitCount</STRONG> (Thumb, 52 bytes, Stack size 0 bytes, fp1.o(MYCODE))
-<BR><BR>[Called By]<UL><LI><a href="#[12]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;FailState
+<P><STRONG><a name="[12]"></a>GetBitCount</STRONG> (Thumb, 52 bytes, Stack size 0 bytes, fp1.o(MYCODE))
+<BR><BR>[Called By]<UL><LI><a href="#[10]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;FailState
 </UL>
 <P>
 <H3>
