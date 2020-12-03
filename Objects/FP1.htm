@@ -3,7 +3,7 @@
 <title>Static Call Graph - [.\Objects\FP1.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image .\Objects\FP1.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060300: Last Updated: Tue Dec 01 16:17:07 2020
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060300: Last Updated: Wed Dec 02 18:23:31 2020
 <BR><P>
 <H3>Maximum Stack Usage =          0 bytes + Unknown(Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
@@ -151,8 +151,9 @@ Local Symbols
 <BR>[Called By]<UL><LI><a href="#[9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;GameStart
 </UL>
 
-<P><STRONG><a name="[12]"></a>FailState</STRONG> (Thumb, 44 bytes, Stack size 0 bytes, fp1.o(MYCODE))
-<BR><BR>[Calls]<UL><LI><a href="#[6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;oneSecondDelay
+<P><STRONG><a name="[12]"></a>FailState</STRONG> (Thumb, 68 bytes, Stack size 0 bytes, fp1.o(MYCODE))
+<BR><BR>[Calls]<UL><LI><a href="#[14]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;GetBitCount
+<LI><a href="#[6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;oneSecondDelay
 <LI><a href="#[4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;IDLE
 </UL>
 <BR>[Called By]<UL><LI><a href="#[11]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;LED4
@@ -168,6 +169,10 @@ Local Symbols
 <LI><a href="#[10]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;LED3
 <LI><a href="#[e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;LED2
 <LI><a href="#[d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;LED1
+</UL>
+
+<P><STRONG><a name="[14]"></a>GetBitCount</STRONG> (Thumb, 52 bytes, Stack size 0 bytes, fp1.o(MYCODE))
+<BR><BR>[Called By]<UL><LI><a href="#[12]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;FailState
 </UL>
 <P>
 <H3>

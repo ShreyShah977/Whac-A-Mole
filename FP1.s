@@ -66,10 +66,11 @@ RCC_CFGR2	EQU		0x4002102C	; Clock Configuration Register 2
 
 ; Times for delay routines
         
-DELAYTIME	EQU		300000	; TIMER
+DELAYTIME	EQU		200000	; TIMER
 PDTIME	EQU		600000	; TIMER
 PDTIME2	EQU		500000	; TIMER
 REACT_TIME EQU	550000	; GameWaitTime
+FAIL_TIME   EQU  350000 ; Fail Sequence Light Time
 ; Vector Table Mapped to Address 0 at Reset
             AREA    RESET, Data, READONLY
             EXPORT  __Vectors
@@ -251,7 +252,7 @@ GameStart    PROC
 
 continuePlay
 	LDR R1,= 0x4444444;
-;; Rand Generator
+
     LDR R7, =GPIOA_CRH;
 	STR R1, [R7];
 	LDR R8, = PDTIME2;
@@ -267,9 +268,9 @@ loopmain;
 	
 	CMP R4, #0x0;
 	BEQ LED1;
-	CMP R4, #0xC0000000;
-	BEQ LED2;
 	CMP R4, #0x80000000;
+	BEQ LED2;
+	CMP R4, #0xC0000000;
 	BEQ LED3;
 	CMP R4, #0x40000000;
 	BEQ LED4;	
@@ -287,8 +288,8 @@ FinishedWinAnim
 Rand  PROC
 ;; Rand Generator
 
-	LDR R1,= 50051;
-	LDR R10, = 50051;
+	LDR R1,= 5000077;
+	LDR R10, = 5000077;
 	MUL R12,R1;
 	ADD R12, R10;
 	AND R4, R12, #0xC0000000;
@@ -341,7 +342,7 @@ TimerLoop1
 	CMP R5, #0x1;
 	BEQ TurnOff1;
 	BGT FailState
-	SUB R6, R6, #1;
+	SUB R6, R6, #2;
 	CBZ R6, FailState
 	B TimerLoop1
 	ALIGN
@@ -362,7 +363,7 @@ TimerLoop2
 	BEQ TurnOff1;
 	CMP R5, #0x1;
 	BGE FailState
-	SUB R6, R6, #1;
+	SUB R6, R6, #2;
 	CBZ R6, FailState
 	B TimerLoop2
 	ALIGN
@@ -385,7 +386,7 @@ TimerLoop3
 	BEQ TurnOff1;
 	CMP R5, #0x1;
 	BGE FailState
-	SUB R6, R6, #1;
+	SUB R6, R6, #2;
 	CBZ R6, FailState
 	B TimerLoop3
 	ALIGN
@@ -407,28 +408,36 @@ TimerLoop4
 	CMP R5, #0x1;
 	BGE FailState;
 	CBZ R3, TurnOff1;
-	SUB R6, R6, #1;
+	SUB R6, R6, #2;
 	CBZ R6, FailState
 	B TimerLoop4
 	ALIGN
 	ENDP
 FailState PROC
-
 	LDR R7,= GPIOA_CRH;
-	LDR R0,= 0x3;
+	LDR R0,= 0x5;
 	LDR R1,= 0x33330;
 	STR R1, [R7];
 	LDR R8,= DELAYTIME
 	BL oneSecondDelay;
+	CBZ R2, leave;
+	BL GetBitCount
+	
 Failloop
-	LDR R1,= 0x0;
 	STR R1, [R7];
-	LDR R8,= DELAYTIME
+	LDR R8,= FAIL_TIME
 	BL oneSecondDelay;
+	LDR R2,= 0x0;
+	STR R2, [R7];
+	LDR R8,= FAIL_TIME;
+	BL oneSecondDelay
 	SUB R0, R0, #1;
 	CBZ R0, leave
 	B Failloop
 leave
+	POP {R1,R2,R3,R4,R5,R6}
+	LDR R8,= DELAYTIME;
+	BL oneSecondDelay
 	B IDLE
 	ALIGN
 	ENDP
@@ -444,14 +453,39 @@ TurnOff1  PROC
 	SUB R1, R1, R10;
 	STR R1, [R6];
 	
-	CMP R2, #15;
+	CMP R2, #16;
 	BEQ JumpWin
 	B continuePlay;
 	ALIGN
 	ENDP
-
-
-
+GetBitCount PROC
+	;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	;; Obtain the level number and represent 
+	;; it as a sequence of lights in binary
+	;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	;; We know level is stored in R2.
+	LDR R4,= 0x0;
+	LDR R5,= 0x8;
+	LDR R8,= 0x30;
+GetDigits
+	CBZ R5, Done;
+	
+	AND R1, R2, R5;
+	CMP R1, R5;
+	ORREQ R4, R8;
+	LSL R8, R8, #4;
+	LSR R5, R5, #1;
+	B GetDigits	
+Done
+	LDR R1,= 0;
+	MOV R1, R4;
+	LDR R4,= 0;
+	LDR R8,= 0;
+	
+	BX LR
+	ALIGN
+	ENDP
+		
 Finish
 	
 	END
